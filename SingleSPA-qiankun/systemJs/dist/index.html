@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="systemjs-importmap">
+    {
+     "imports": {
+       "react": "https://cdn.bootcdn.net/ajax/libs/react/17.0.2/umd/react.production.min.js",
+       "react-dom": "https://cdn.bootcdn.net/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js",
+     } 
+    }
+  </script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/systemjs/6.10.1/system.min.js"></script>
+  <script>
+    function SystemJS() {
+
+    }
+    let set = new Set();
+    const saveGlobalPro = () => {
+      for(let p in window) {
+        set.add(p);
+      }
+    }
+    const getGlobalLastPro = () => {
+      let result;
+      for(let p in window) {
+        if(set.has(p)) continue;
+        result = window[p]
+        result.default = result;
+      }
+      return result;
+    }
+    function load(id) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = id;
+        script.async = true;
+        document.head.appendChild(script);
+        script.addEventListener('load', function() {
+          console.log('脚本加载完成')
+          // 加载后会拿到依赖和回调函数
+          let _lastRegister = lastRegister;
+          lastRegister = undefined;
+          if(!_lastRegister) { // 没有其它依赖就返回空的
+            resolve([], function(){})
+          }
+          resolve(_lastRegister);
+        })
+      })
+    }
+    SystemJS.prototype.import = function(id) {
+      return new Promise((resolve, reject) => {
+        const lastSepIndex = window.location.href.lastIndexOf('/');
+        const baseUrl = location.href.slice(0, lastSepIndex+1);
+        if(id.startWith('./')) {
+          resolve(baseUrl + id.slice(2))
+        }
+      }).then(id => {
+        let exec;
+       return  load(id).then(registration => {
+         function _export() {}
+         let declared = registration[1](_export)
+         exec = declared.execute
+         return [registration[0], declared.setter]
+       }).then(info => {
+         return Promise.all(info[0].map((dep, i)=> {
+           var setter = info[1][i];
+           return load(dep).then(r=>{
+             let p = getGlobalLastPro();
+             setter(p);
+           })
+         }))
+       }).then(()=>{})
+      })
+    }
+    let lastRegister; // 收集依赖
+    SystemJS.prototype.register = function(deps, cb) {
+      lastRegister = [deps, cb] // 打包后会调用register方法
+
+    }
+    let System = new SystemJS();
+    // 动态加载,加载的时候遇到依赖react，react-dom没有打包，就要去上面system-importmap里面找，远程加载连接，类似于cdn
+    System.import('./index.js').then(() => {
+      
+    })
+  </script>
+</body>
+</html>
