@@ -1,0 +1,9 @@
+iframe适合接入第三方，像路由切换做不到
+webComponent兼容性不好被废弃
+2018年，singleSPA，没有实现样式分离js隔离，没有沙箱机制，做到了将单个应用嵌入到父应用，实现了路由劫持和应用加载
+2019年，qiankun基于singleSPA提供了开箱即用API（singleSPA+sandbox+import-html-entry）
+2020年，EMP基于module Federation，接入成本低，解决第三方依赖包的问题，乾坤还是要导出bootstrap，mount，unmount等，要改造原有项目
+
+用singleSPA就要用StstemJS，它是一个通用的模块加载器，能在浏览器上动态加载模块，微前端的核心就是加载微应用，将应用打包成模块在浏览器通过systemjs来加载
+
+
