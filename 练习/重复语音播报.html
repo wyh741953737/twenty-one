@@ -22,19 +22,20 @@
       reportLocalAudio(['你好我是2021年9月11日'])
     }, false)
     many.addEventListener('click', function(e) {
-      reportLocalAudio(['今天是星期一', 'hello,my name is 曦曦', '明天是星期二']) 
+      reportLocalAudio(['今天是星期一', 'hello,my name is', '明天是星期二']) 
     }, false)
 
     class AudioPlay {
       constructor(url) {
-         this.url = url;
+         this.urls = url;
          this.played = 0;
       }
      async loop() {
-        audios.length > 0 &&  await this.stop();
+        audios.length > 0 &&  this.stop();
         audios = [];
-        for(let u in this.url) {
-          audios.push(new Audio(this.url[u]));
+        for(let keyword of this.urls) {
+            const url = 'http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=' + encodeURI(keyword);
+            audios.push(new Audio(url));
         }
         this.play();
       }
@@ -55,12 +56,7 @@
     }
 
   async function reportLocalAudio(arr) {
-     const urls = []
-     arr.forEach(item => {
-       const url = 'http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=' + encodeURI(item);
-       urls.push(url)
-     })
-     const audioInstance = new AudioPlay(urls)
+     const audioInstance = new AudioPlay(arr)
      audioInstance.loop()
   }
 
