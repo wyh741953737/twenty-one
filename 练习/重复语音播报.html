@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+</head>
+
+<body>
+  <button id="single">播放单个语言</button>
+  <button id="many">播放多个语音</button>
+
+  <script>
+    const single = document.getElementById('single')
+    const many = document.getElementById('many')
+    
+    let audios = [];
+    single.addEventListener('click', function(e) {
+      reportLocalAudio(['你好我是2021年9月11日'])
+    }, false)
+    many.addEventListener('click', function(e) {
+      reportLocalAudio(['今天是星期一', 'hello,my name is 曦曦', '明天是星期二']) 
+    }, false)
+
+    class AudioPlay {
+      constructor(url) {
+         this.url = url;
+         this.played = 0;
+      }
+     async loop() {
+        audios.length > 0 &&  await this.stop();
+        audios = [];
+        for(let u in this.url) {
+          audios.push(new Audio(this.url[u]));
+        }
+        this.play();
+      }
+      play() {
+        if(this.played >= audios.length) return;
+        audios[this.played].play();
+        const that = this;
+        audios[that.played].addEventListener('ended', function() {
+          that.played++;
+          that.play();
+        })
+      }
+     stop() {
+        audios.forEach(item => {
+           item.pause();
+        })
+      }
+    }
+
+  async function reportLocalAudio(arr) {
+     const urls = []
+     arr.forEach(item => {
+       const url = 'http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=' + encodeURI(item);
+       urls.push(url)
+     })
+     const audioInstance = new AudioPlay(urls)
+     audioInstance.loop()
+  }
+
+
+
+  </script>
+</body>
+
+</html>
