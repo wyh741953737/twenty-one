@@ -8,7 +8,12 @@
     </swiper-item>
   </swiper>
   <!--导航-->
-  <view class="navContainer">
+  <view 
+  bindtouchstart="handleTouchStart"
+   bindtouchmove="handleTouchMove"
+   bindtouchend="handleTouchEnd"
+   style="transform: {{coverTransform}}; transition: {{coverTransition}};"
+    class="navContainer">
     <view class="navItem">
       <text class="iconfont icon-meirituijian"></text>
       <text>每日推荐</text>
@@ -65,8 +70,6 @@
 
   <view class="topList">
     <NavHeader title="排行榜" nav="新歌风向标"></NavHeader>
-
-
     <swiper class="topListSwiper" circular="true" next-margin="50rpx" previous-margin="50rpx">
       <swiper-item>
         <view class="swiperItem">
@@ -126,5 +129,11 @@
       </swiper-item>
 
     </swiper>
+  </view>
+
+  <view>
+    <input id="name" bindinput="handleInput" data-type="name" placeholder="请输入姓名" />
+    <input id="tel" bindinput="handleInput" data-type="tel" placeholder="请输入电话" />
+    <Button bindtap="login">登录</Button>
   </view>
 </view>

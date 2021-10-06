@@ -1,3 +1,5 @@
+import config from './util'
+
 const formatTime = date => {
   const year = date.getFullYear()
   const month = date.getMonth() + 1
@@ -14,13 +16,10 @@ const formatNumber = n => {
   return n[1] ? n : `0${n}`
 }
 
-const  config = {
-  url: 'http://localhost:3000'
-}
 const request = (url, data={}, method="GET") => {
   return new Promise((resolve, reject) => {
     wx.request({
-      url: `${config.url}${url}`,
+      url: `${config.host}${url}`,
       data,
       method,
       success: (res) => {
