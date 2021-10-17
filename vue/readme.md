@@ -59,3 +59,6 @@ mudules模块化vuex
 
 ### 模块化
 ES6模块化：浏览器和服务端通用的模块化规范
+### directives指令
+bind， inserted， update
+简写：以函数形式，执行bind和update钩子，某些情况下比如获取焦点，写在inserted，以对象形式

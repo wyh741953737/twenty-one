@@ -1,0 +1,8 @@
+<!--index.wxml-->
+<view class="indexContainer">
+  <image src="https://pic1.zhimg.com/v2-9c79fc97d696e8d34f4278da7710edde_r.jpg" class="avatarUrl"></image>
+  <text></text>
+  <view class="usermotto">
+    dd
+  </view>
+</view>
