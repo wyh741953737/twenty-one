@@ -50,7 +50,7 @@ updated：页面和数据同步
 beforeDestory：data，methods，指令，过滤器都可用
 destoryed：不可用
 
-### 
+### vuex
 state数据存放
 getters从基本数据派生出的数据
 mutation：提交更改数据的同步方法
@@ -62,3 +62,38 @@ ES6模块化：浏览器和服务端通用的模块化规范
 ### directives指令
 bind， inserted， update
 简写：以函数形式，执行bind和update钩子，某些情况下比如获取焦点，写在inserted，以对象形式
+
+### v-show和v-if区别
+v-show通过css样式控制显示隐藏，使用频繁用v-show，v-if是销毁和重新创建
+
+### 动态绑定class的方法
+:class="{'isActive': showActive}"
+:class="[class1, class2]"
+:style="color: activeColor"
+
+### 计算属性和watch区别
+计算属性通过依赖的变发生改变重新计算
+watch监听，计算属性能做到的，watch都能做到
+computed是一个对象时，有get和set两个选项
+computed是可以缓存的， 依赖其他computed甚至是其他组件的data
+watch：handler， deep和immediate
+当有一些数据要随另一个数据变化时候使用computed
+当有一个通用的响应数据变化时。要执行一些业务逻辑或一步操作时候
+### 怎么理解单向数据流
+父组件通过props将数据传递给子组件，但是这props只能由父组件修改，子组件不能修改，否则会报错，子组件向修改只能通过$emit通知父组件修改
+子组件想修改父组件：子组件data中拷贝一份prop，data是可以修改的，但是prop不能
+#### keep-alve
+能够让组件缓存，不会因为页面的跳转重新销毁和生成
+
+
+### Object.defineProperty
+通过赋值操作添加的普通属性是可以枚举的，for..in Object.keys
+Object.defineProperty添加的属性值是不可修改的
+数据描述符：具有值的属性
+存取描述符：由getter函数和setter函数描述的属性
+configurable，enumberable，value，writable
+存取描述符还可以有get，set
+
+const descriptor = Object.create(null) 没有继承的属性，没有enumberable，configrable，没有writable
+
+### 
