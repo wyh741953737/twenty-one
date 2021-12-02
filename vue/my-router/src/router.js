@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from './myRouter'
 import Home from './components/Home.vue'
 import About from './components/About.vue'
+import Child from './components/Child.vue'
 
 Vue.use(VueRouter)
 const routes = [
@@ -13,7 +14,13 @@ const routes = [
   {
     path: '/about',
     name: 'about',
-    component: About
+    component: About,
+    children: [
+      {
+        path: '/about/child',
+        component: Child
+      }
+    ]
   }
 ]
 const router = new VueRouter({
