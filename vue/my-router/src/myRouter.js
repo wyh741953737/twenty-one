@@ -54,6 +54,7 @@ VueRouter.install = function (_vue) {
       return h('a', { attrs: { href: '#' + this.to } }, this.$slots.default)
     }
   })
+
   Vue.component('router-view', {
     render (h) {
       // 标记当前router-view深度
