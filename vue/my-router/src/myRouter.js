@@ -3,7 +3,7 @@ class VueRouter {
   constructor(options) {
     this.$options = options
     // 将current变成响应式的，router-view能够重新渲染
-    this.current = window.location.hash.slice('#') || '/'
+    this.current = window.location.hash.slice(1) || '/'
     Vue.util.defineReactive(this, 'matched', [])
     this.match()
     window.addEventListener('hashchange', this.onHashChange.bind(this))
@@ -18,6 +18,7 @@ class VueRouter {
     this.current = window.location.hash.slice(1)
     this.matched = []
   }
+  // match方法可以递归遍历路由表
   match (routes) {
     routes = routes || this.$options.routes
     for (const route of routes) {
@@ -66,6 +67,9 @@ VueRouter.install = function (_vue) {
         if (vNodeData) {
           if (vNodeData.routerView) {
             depth++
+          }
+          if(vNodeData.keepAlive && parent._inactive) {
+            _inactive = true
           }
         }
         parent = this.$parent

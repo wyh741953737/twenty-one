@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    Child
+    我是子组件子组件我是子组件子组件我是子组件子组件我是子组件子组件我是子组件子组件
   </div>
 </template>
 

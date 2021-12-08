@@ -11,8 +11,8 @@ class Store {
     this._actions = options.actions
     this.commit = this.commit.bind(this)
     this.dispatch = this.dispatch.bind(this)
-    this.getters = {}
-
+    this.getters = options.getters
+    console.log(options)
 
   }
   get state () {
@@ -26,11 +26,12 @@ class Store {
     entry(this.state, payload)
   }
   dispatch (type, payload) {
+    // dispatch可能以对象形式传入
     const entry = this._actions[type]
     if (!entry) {
       console.log('unknow action type')
     }
-    entry(this, payload)
+    entry(this, payload) // 注意这里的this
   }
 }
 
