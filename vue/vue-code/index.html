@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>{{counter}}</p>
+  </div>
+  <script>
+    // 数据响应式
+    function defineReactive(obj, key, val) {
+      observe(val)
+      Object.defineProperty(obj, key, {
+        get() {
+          console.log('get', key)
+          return val
+        },
+        set(newVal) {
+          console.log('set', key)
+          if(newVal !== val) {
+            observe(newVal)
+            val = newVal
+          }
+        }
+      })
+    }
+
+    const obj = {
+      foo: 'foo',
+      bar: {
+        age: 1
+      }
+    }
+
+    function observe(obj) {
+      if(typeof obj !== 'object' || obj === null) return
+      Object.keys(obj).forEach(key => {
+        defineReactive(obj, key, obj[key])
+      }) 
+    }
+    observe(obj)
+    obj.bar.age = 10
+
+    function set(obj, key, val) {
+      defineReactive(obj, key, val)
+    }
+    set(obj, 'xixi', { age: 4})
+    // 数组一些方法：shift， unshift， pop， push， 
+
+    const app = new Vue({
+      el: '#app',
+      data: {
+        counter: 1
+      }
+    })
+    // setInterval(() => {
+    //   app.counter++
+    // }, 1000);
+  </script>
+</body>
+</html>
