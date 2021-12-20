@@ -11,9 +11,9 @@
 <body>
   <div id="app">
     <p>{{counter}}</p>
-    <p>{{name}}</p>
+    <!-- <p>{{name}}</p>
     <p k-html="desc"></p>
-    <p k-text="counter"></p>
+    <p k-text="counter"></p> -->
 
   </div>
   <script>
@@ -22,11 +22,17 @@
     // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件
     // 发布订阅模式：订阅者把自己想订阅的事注册到调度中心，当发布者发布这个事件，由调度中心统一调度
     // 数据响应式
+    const watchers = []
+    
     function defineReactive(obj, key, val) {
+      // 创建Dep实例
+      const dep = new Dep()
       observe(val)
       Object.defineProperty(obj, key, {
         get() {
           console.log('get', key)
+          // 依赖收集
+          Dep.target && dep.addDep(Dep.target)
           return val
         },
         set(newVal) {
@@ -34,9 +40,24 @@
           if(newVal !== val) {
             observe(newVal)
             val = newVal
+            // watchers.forEach(w => w.update()) // 这样一个更新所有都更新，需要只更新一个
+            dep.notify()
           }
         }
       })
+    }
+
+    class Dep {
+      // 观察者
+      constructor() {
+        this.deps = []
+      }
+      addDep(dep) {
+        this.deps.push(dep)
+      }
+      notify() {
+        this.deps.forEach(dep => dep.update())
+      }
     }
 
     class Observer {
@@ -55,6 +76,23 @@
       }
     }
   
+    // 监听器，负责依赖的更新
+    class Watcher {
+      constructor(vm, key, updateFn) {
+        this.vm = vm
+        this.key = key
+        this.updateFn = updateFn
+        // watchers.push(this)
+        Dep.target = this
+        this.vm[this.key]
+        Dep.target = null
+      }
+      update() {
+        // 执行实际的更新操作
+        this.updateFn.call(this.vm, this.vm[this.key])
+      }
+    }
+    
     function observe(obj) {
       if(typeof obj !== 'object' || obj === null) return
       new Observer(obj)
@@ -72,6 +110,7 @@
         })
       })
     }
+  
     class KVue {
       constructor(options) {
         this.$options = options
@@ -81,7 +120,7 @@
         observe(this.$data)
         proxy(this)
         // 编译
-        // 获取dom，遍历子元素（[编译节点，遍历属性[遍历k-开头（k-html处理innerHtml， k-model监听inpur）， 遍历at开头（绑定click）]], 编译文本
+        // 获取dom，遍历子元素（[编译节点，遍历属性[遍历k-开头（k-html处理innerHtml， k-model监听input）， 遍历at开头（绑定click）]], 编译文本
         new Compile(options.el, this)
       }
     }
@@ -94,13 +133,29 @@
           this.compile(this.$el)
         }
       }
+      update(node, exp, dir) {
+        // 1:初始化，一上来就能看到的值
+        const fn = this[dir+'Updater']
+        fn && fn(node, this.$vm[exp])
+
+        // 2：更新
+        new Watcher(this.$vm, exp, function(val) {
+          fn && fn(node, val)
+        })
+      }
+      textUpdater(node, value) {
+        node.textContent = value
+      }
+      htmlUpdater(node, value) {
+        node.innerHTML = value
+      }
+      
       compile(el) {
         // 遍历el子节点，判断类型
         const childNodes = el.childNodes
         childNodes.forEach(node => {
           if(node.nodeType === 1) {
             // 元素, 判断属性
-            console.log('元素', node.textContent)
             // 处理指令和事件
             const attrs = node.attributes
             Array.from(attrs).forEach(attr => {
@@ -114,7 +169,6 @@
             })
           } else if(this.isInter(node)) {
             // 文本
-            console.log('插值', node.textContent)
             this.compileText(node)
           }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
           if(node.childNodes) {
@@ -127,27 +181,28 @@
         return node.nodeType === 3 && /\{\{(.*)\}\}/.test(node.textContent)
       }
       compileText(node) {
-        node.textContent = this.$vm[RegExp.$1]  // RegExp.$1是RegExp的一个属性,指的是与正则表达式匹配的第一个子匹配(以括号为标志)字符串
+        // node.textContent = this.$vm[RegExp.$1]  // RegExp.$1是RegExp的一个属性,指的是与正则表达式匹配的第一个子匹配(以括号为标志)字符串
+        this.update(node, RegExp.$1, 'text')
       }
+      // k-text
       text(node, exp) {
-        node.textContent = this.$vm[exp]
+        // node.textContent = this.$vm[exp]
+        this.update(node, exp, 'text')
       }
       html(node, exp) {
-        node.innerHTML = this.$vm[exp]
+        this.update(node, exp, 'html')
       }
     }
 
     const app = new KVue({
       el: '#app',
       data: {
-        counter: 1,
-        name: '信息',
-        desc: '<psan>你好</span>'
+        counter: 1
       }
     })
-    setInterval(() => {
+    setTimeout(() => {
       app.$data.counter++
-    }, 2000)
+    }, 1000)
   </script>
 </body>
 </html>
