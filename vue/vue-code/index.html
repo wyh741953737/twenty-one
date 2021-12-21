@@ -6,14 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-  <script src="./public.js"></script>
 </head>
 <body>
   <div id="app">
     <p>{{counter}}</p>
+    <!-- <button @click="btnClick('aaa')">点击事件</button> -->
+    <button @click="btnClickNo">点击事件2</button>
+    <span>{{desc}}</span>
+    <input type="text" v-model="desc">
     <!-- <p>{{name}}</p>
-    <p k-html="desc"></p>
-    <p k-text="counter"></p> -->
+    <p v-html="desc"></p>
+    <p v-text="counter"></p> -->
 
   </div>
   <script>
@@ -21,8 +24,17 @@
     // 观察者模式：一对多，是一种行为模式，行为模式关注的是对象之间的通信，
     // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件
     // 发布订阅模式：订阅者把自己想订阅的事注册到调度中心，当发布者发布这个事件，由调度中心统一调度
-    // 数据响应式
+  
     const watchers = []
+    
+    // const arrayProto = Object.create(Array.prototype)
+    // ['push', 'pop', 'shift', 'unshift'].forEach(method => {
+    //   arrayProto[method] = function() {
+    //     Array.prototype[method].apply(this, arguments)
+    //     // 覆盖操作，通知更新
+    //     console.log('数组执行' + method + '操作')
+    //   }
+    // })
     
     function defineReactive(obj, key, val) {
       // 创建Dep实例
@@ -40,7 +52,6 @@
           if(newVal !== val) {
             observe(newVal)
             val = newVal
-            // watchers.forEach(w => w.update()) // 这样一个更新所有都更新，需要只更新一个
             dep.notify()
           }
         }
@@ -95,6 +106,15 @@
     
     function observe(obj) {
       if(typeof obj !== 'object' || obj === null) return
+      // if(Array.isArray(obj)) {
+      //   obj.__proto__ = arrayProto // 覆盖原型，替换7个变更操作
+      //   // 对数组内部元素执行响应式
+      //   const keys = Object.keys(obj)
+      //   for(let i = 0; i < obj.length; i++) {
+      //     observe(obj[i])
+      //   }
+      // } else {
+      // }
       new Observer(obj)
     }
 
@@ -159,12 +179,17 @@
             // 处理指令和事件
             const attrs = node.attributes
             Array.from(attrs).forEach(attr => {
-              // k-xxx='aaa'
+              // v-xxx='aaa'
               const attrName = attr.name
-              const exp = attr.value
-              if(attrName.startsWith('k-')) {
+              let exp = attr.value
+              if(this.isDirective(attrName)) {
                 const dir = attrName.substring(2)
                 this[dir] && this[dir](node, exp)
+              }
+              // 事件处理
+              if(this.isEvent(attrName)) {
+                const dir = attrName.substring(1)
+                this.eventHandler(node, exp, dir )
               }
             })
           } else if(this.isInter(node)) {
@@ -192,17 +217,51 @@
       html(node, exp) {
         this.update(node, exp, 'html')
       }
+      isEvent(dir) {
+        return dir.indexOf('@') == 0
+      }
+      eventHandler(node, exp, dir) {
+        const fn = this.$vm.$options.methods && this.$vm.$options.methods[exp]
+        console.log(fn, this.$vm.$options.methods, exp)
+        node.addEventListener(dir, fn.bind(this.$vm))
+      }
+      isDirective(attr) {
+        return attr.startsWith('v-')
+      }
+      // v-model='xxx'
+      model(node, exp) {
+        // update只完成赋值和更新，不完成事件监听
+        this.update(node, exp, 'model')
+        node.addEventListener('input', e => {
+          this.$vm[exp] = e.target.value
+        })
+      }
+      modelUpdater(node, value) {
+        // 表单元素赋值
+        node.value = value
+      }
     }
 
     const app = new KVue({
       el: '#app',
       data: {
-        counter: 1
-      }
+        counter: 1,
+        arr: ['曦'],
+        desc: '<span>你好啊</span>'
+      },
+      methods: {
+        btnClick(str) {
+          console.log('我是this',this, str)
+          this.counter++
+        },
+        btnClickNo() {
+          this.counter++
+        },
+        inputVlaue() {
+
+        }
+      },
     })
-    setTimeout(() => {
-      app.$data.counter++
-    }, 1000)
   </script>
 </body>
 </html>
