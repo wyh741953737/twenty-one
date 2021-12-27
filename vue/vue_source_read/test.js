@@ -1,3 +1,8 @@
+import { callHook } from "../vue/src/core/instance/lifecycle"
+import Watcher from "../vue/src/core/observer/watcher"
+import { handleError, invokeWithErrorHandling } from "../vue/src/core/util"
+import { mark, measure } from "../vue/src/core/util/perf"
+
 var emptyObject = Object.freeze({})
 function isUndef(v) { return v === undefined || v === null }
 function isDef(v) { return v !== undefined || v !== null }
@@ -559,4 +564,173 @@ function defineReactive$$1(obj, key, val, customSetter, shallow) {
       dep.notify()
     }
   })
+}
+
+let activeInstance = null
+let isUpdatingChildComponent = false
+function setActiveInstance(vm) {
+  const prevActiveInstance = activeInstance
+  activeInstance = vm
+  return () => {
+    activeInstance = prevActiveInstance
+  }
+}
+
+function initLifecycle(vm) {
+  const options = vm.$options
+  let parent = options.parent
+  if(parent && !options.abstract) {
+    while(parent.$options.abstract && parent.$parent) {
+      parent = parent.$parent
+    }
+    parent.$children.push(vm)
+  }
+  vm.$parent = parent
+  vm.$root = parent ? parent.$root : vm
+  vm.$children = []
+  vm.$refs = {}
+  vm._watcher = null
+  vm._inactive = null
+  vm._directInstance = false
+  vm._isMounted = false
+  vm._isDestoryed = false
+  vm._isBeingDestoryed = false
+}
+function lifecycleMixin(Vue) {
+  Vue.prototype._update = function(vnode, hydrating) {
+    const vm = this
+    const prevEl = vm.$el
+    const prevVnode = vm._vnode
+    const restoreActiveInstance = setActiveInstance(vm)
+    vm._vnode = vnode
+    if(!prevVnode) {
+      vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false)
+    } else {
+      v.$el = vm.__patch__(prevVnode, vnode)
+    }
+    restoreActiveInstance()
+    if(prevEl) {
+      prevEl.__vue__ = null
+    }
+    if(vm.$el) {
+      vm.$el.__vue__ = vm
+    }
+    if(vm.$vnode && vm.$parent && vm.$vnode === vm.$parent._vnode) {
+      vm.$parent.$el = vm.$el
+    }
+  }
+  Vue.prototype.$foreceUpdate = function() {
+    const vm = this
+    if(vm._watcher) {
+      vm._watcher.update()
+    }
+  }
+}
+export function mountComponent(vm, el, hydrating) {
+  vm.$el = el
+  if(!vm.$options.render) {
+    vm.$options.render = createEmptyVNode
+  }
+  callHook(vm, 'beforeMount')
+  let updateComponent
+  if(process.env.NODE_ENV !== 'production' && config.performance && mark) {
+    updateComponent = () => {
+      const name = vm.name
+      const id = vm._uid
+      const startTag = `vue-perf-start:${id}`
+      const endTag = `vue-perf-end:${id}`
+      mark(startTag)
+      const vnode = vm._render()
+      mark(endTag)
+      measure(`vue ${name} render`, startTag, endTag)
+
+      mark(startTag)
+      vm._update(vnode, hydrating)
+      mark(endTag)
+      measure(`vue ${name} patch`, startTag,endTag)
+    }
+  } else {
+    updateComponent = () => {
+      vm._update(vm._render(), hydrating)
+    }
+  }
+  new Watcher(vm, updateComponent, noop, {
+    before() {
+      if(vm._isMounted && !vm._isDestoryed) {
+        callHook(vm, 'beforeUpdate')
+      }
+    }
+  }, true)
+  hydrating = false
+  if(vm.$vnode == null) {
+    vm._isMounted = true
+    callHook(vm, 'mounted')
+  }
+  return vm
+}
+export function updateChildComponent(vm, propsData, listeners, parentVnode, renderChildren) {
+  if(process.env.NODE_ENV !== 'production') {
+    isUpdatingChildComponent = true
+    //..............
+    //............... //////
+  }
+}
+
+function isInInactiveTree(vm) {
+  while(vm && (vm = vm.$parent)) {
+    if(vm._inactive) return true
+  }
+  return false
+}
+export function activateChildComponent(vm, direct) {
+  if(direct) {
+    vm._directInstance = false
+    if(isInInactiveTree(vm)) return
+  } else if(vm._directInactive) {
+    return
+  }
+  if(vm._inactive || vm._inactive === null) {
+    vm._inactive = false
+    for(let i = 0; i < vm.$children.length; i++) {
+      activateChildComponent(vm.$children[i])
+    }
+    callHook(vm, 'activated')
+  }
+}
+export function dactivateChildComponent(vm, direct) {
+  if(direct) {
+    vm._directInactive = true
+    if(isInInactiveTree(vm)) {
+      return
+    }
+  }
+  if(!vm._inactive) {
+    vm._inactive = true
+    for(let i = 0; i<vm.$children.length; i++) {
+      dactivateChildComponent(vm.$children[i])
+    }
+    callHook(vm, 'dactivated')
+  }
+}
+
+export function callHook(vm, hook) {
+  pushTarget()
+  const handlers = vm.$options[hook]
+  const info = `${hook} hook`
+  if(handlers) {
+    for(let i =0; i < handlers.length; i++) {
+      invokeWithErrorHandling(handlers[i], vm, null, vm, info)
+    }
+  }
+  if(vm._hasHookEvent) {
+    vm.$emit('hook:'+hook)
+  }
+  popTarget()
+}
+
+function mountComponent(vm, el, hydrating) {
+  vm.$el = el
+  if(!vm.$options.render) {
+    
+  }
 }
