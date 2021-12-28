@@ -9,11 +9,11 @@
 </head>
 <body>
   <div id="app">
-    <p>{{counter}}</p>
+    <!-- <p>{{counter}}</p> -->
     <!-- <button @click="btnClick('aaa')">点击事件</button> -->
-    <button @click="btnClickNo">点击事件2</button>
+    <!-- <button @click="btnClickNo">点击事件2</button> -->
     <span>{{desc}}</span>
-    <input type="text" v-model="desc">
+    <!-- <input type="text" v-model="desc"> -->
     <!-- <p>{{name}}</p>
     <p v-html="desc"></p>
     <p v-text="counter"></p> -->
@@ -242,7 +242,7 @@
       }
     }
 
-    const app = new KVue({
+    const app = new Vue({
       el: '#app',
       data: {
         counter: 1,
@@ -260,6 +260,11 @@
         inputVlaue() {
 
         }
+      },
+      mounted() {
+        setTimeout(() => {
+          this.desc = '我是mount中变化的'
+        }, 1000)
       },
     })
   </script>
