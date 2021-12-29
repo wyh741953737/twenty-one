@@ -102,6 +102,21 @@ options上的components有keepAlive, Transition, TransitionGroup
 17: 初始化render函数initRender
 18： 执行callHook(vm, 'beforeCreate'), beforeCreate hook
 19: 初始化injection，
-20： 初始化state
+20： 初始化state(props, methods, data, computed, watch)
+
+new Vue() => _init() => $mount() => mountComponent => new Watcher() => updateComponent => render() => _update()
 
 
+### vue异步更新是如何实现的
+Quque， 不马上做，放在队列中
+批量异步执行：
+
+事件循环：浏览器为了协调事件处理，脚本执行，网络请求和渲染等任务和制定的机制
+宏任务：浏览器完成一个宏任务，在下一个宏任务执行开始前会对页面进行重新渲染，主要包括：创建文档对象，解析HTML，执行主线程代码以及各种页面加载插入，网络事件，定时器等
+微任务：当前宏任务执行结束后立即执行的任务，如果存在微任务，浏览器会清空微任务之后再重新渲染，比如promie，requestAnimationFrame，DOM变化等待
+
+vue中使用nextTick
+异步：只要侦听到数据变化，Vue将开启一个队列，并缓冲在同一事件循环中发生的所有数据的变更
+批量：如果同一个watcher被触发多次，只会被推入到队列中一次，在下一个事件循环tick中，Vue刷新队列执行实际工作
+异步策略：Vue在内部尝试promise.then,
+watcher往队列里面添加，

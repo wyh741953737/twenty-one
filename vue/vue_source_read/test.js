@@ -1,6 +1,6 @@
 import { callHook } from "../vue/src/core/instance/lifecycle"
 import Watcher from "../vue/src/core/observer/watcher"
-import { handleError, invokeWithErrorHandling } from "../vue/src/core/util"
+import { handleError, invokeWithErrorHandling, nextTick } from "../vue/src/core/util"
 import { mark, measure } from "../vue/src/core/util/perf"
 
 var emptyObject = Object.freeze({})
@@ -449,10 +449,10 @@ methodsToPatch.forEach(function(method) {
   def(arrayMethods, method, function mutator() {
     var args = [], len = arguments.length
     while(len--) args[len] = arguments[len]
-    var result = original.apply(this, args)
-    var ob = this.__ob__
+    var result = original.apply(this, args) // 执行原始方法
+    var ob = this.__ob__ // 扩展逻辑：变更通知
     var inserted
-    switch (method) {
+    switch (method) { // 如果是插入型方法
       case 'push':
       case 'unshift':
         inserted = args        
@@ -461,8 +461,8 @@ methodsToPatch.forEach(function(method) {
         inserted = args.slice(2)
         break
     }
-    if(inserted) { ob.observeArray(inserted)}
-    ob.dep.notify()
+    if(inserted) { ob.observeArray(inserted)} // 
+    ob.dep.notify() // 变更通知
     return result
   })
 })
@@ -477,9 +477,9 @@ var Observer = function Observer(value) {
   this.vmCount = 0
   def(value, '__ob__', this)
   if(Array.isArray(value)) {
-    if(hasProto) {
+    if(hasProto) { // 如果有原型就做原型的设置
       protoAugment(value, arrayMethods)
-    } else {
+    } else { // 数组没有原型就直接覆盖
       copyAugment(value, arrayMethods, arrayKeys)
     }
     this.observeArray(value)
@@ -500,13 +500,13 @@ Observer.prototype.observeArray = function observeArray(items) {
     observe(items[i])
   }
 }
-function protoAugment(target, src) {
+function protoAugment(target, src) { // target是数组[a,b,c]这样数组就带有变更通知的方法
   target.__proto__ = src
 }
 function copyAugment(target, src, keys) {
   for(var i = 0; i < keys.length; i++) {
     var key = keys[i]
-    def(target, key, src[key])
+    def(target, key, src[key]) // 给数组添加响应式的7个方法
   }
 }
 function observe(value, asRootData) {
@@ -596,16 +596,52 @@ function initLifecycle(vm) {
   vm._isDestoryed = false
   vm._isBeingDestoryed = false
 }
+Vue.prototype.__patch__ = inBrowser ? patch : noop
+function patch(oldVnode, vnode, hydrating, removeOnly) {
+  if(isUndef(vnode)) {
+    if(isDef(oldVnode)) { invokeDestoryHook(oldVnode)}
+    return
+  }
+  let isInitialPatch = false
+  let insertedVnodeQueue = []
+  if(isUndef(oldVnode)) {
+    isInitialPatch = true
+    createElm(vnode, insertedVnodeQueue)
+  } else {
+    let isRealElement = isDef(oldVnode.nodeType)
+    if(!isRealElement && sameVnode(oldVnode, vnode)) {
+      patchVnode(oldVnode, vnode, insertedVnodeQueue, null, null, removeOnly)
+    } else {
+      if(isRealElement) {
+        if(oldVnode.nodeType === 1 && oldVnode.hasAttribute(SSR_ATTR)) {
+          oldVnode.removeAttribute(SSR_ATTR)
+          hydrating = true
+        }
+        if(isTrue(hydrating)) {
+          if(hydrate(oldVnode, vnode, insertedVnodeQueue)) {
+            invokeInsertHook(vnode, insertedVnodeQueue, true)
+            return oldVnode
+          } else if(process.env.NODE_ENV !== 'production') {
+            warn('客户端呈现的虚拟DOM树不匹配服务器呈现的内容。这可能是由不正确的HTML标记，例如内部嵌套块级元素“<p>，或缺少<tbody>')
+          }
+        }
+      }
+      oldVnode = emptyNodeAt(oldVnode)
+    }
+  }
+
+}
 function lifecycleMixin(Vue) {
+  // 将虚拟dom转化为真实dom
   Vue.prototype._update = function(vnode, hydrating) {
     const vm = this
     const prevEl = vm.$el
     const prevVnode = vm._vnode
     const restoreActiveInstance = setActiveInstance(vm)
     vm._vnode = vnode
-    if(!prevVnode) {
+    if(!prevVnode) { // 初始化的时候没有prevVnode，只有最新的
       vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false)
-    } else {
+    } else { // 再执行update的时候就是更新了
       v.$el = vm.__patch__(prevVnode, vnode)
     }
     restoreActiveInstance()
@@ -625,48 +661,6 @@ function lifecycleMixin(Vue) {
       vm._watcher.update()
     }
   }
-}
-export function mountComponent(vm, el, hydrating) {
-  vm.$el = el
-  if(!vm.$options.render) {
-    vm.$options.render = createEmptyVNode
-  }
-  callHook(vm, 'beforeMount')
-  let updateComponent
-  if(process.env.NODE_ENV !== 'production' && config.performance && mark) {
-    updateComponent = () => {
-      const name = vm.name
-      const id = vm._uid
-      const startTag = `vue-perf-start:${id}`
-      const endTag = `vue-perf-end:${id}`
-      mark(startTag)
-      const vnode = vm._render()
-      mark(endTag)
-      measure(`vue ${name} render`, startTag, endTag)
-
-      mark(startTag)
-      vm._update(vnode, hydrating)
-      mark(endTag)
-      measure(`vue ${name} patch`, startTag,endTag)
-    }
-  } else {
-    updateComponent = () => {
-      vm._update(vm._render(), hydrating)
-    }
-  }
-  new Watcher(vm, updateComponent, noop, {
-    before() {
-      if(vm._isMounted && !vm._isDestoryed) {
-        callHook(vm, 'beforeUpdate')
-      }
-    }
-  }, true)
-  hydrating = false
-  if(vm.$vnode == null) {
-    vm._isMounted = true
-    callHook(vm, 'mounted')
-  }
-  return vm
 }
 export function updateChildComponent(vm, propsData, listeners, parentVnode, renderChildren) {
   if(process.env.NODE_ENV !== 'production') {
@@ -727,10 +721,189 @@ export function callHook(vm, hook) {
   }
   popTarget()
 }
-
+// 将虚拟dom转化为真实dom
 function mountComponent(vm, el, hydrating) {
   vm.$el = el
   if(!vm.$options.render) {
-    
+    if(process.env.NODE_ENV !== 'production') {
+      if((vm.$options.template && vm.$options.template.charAt(0) !== '#') || vm.$options.el || el) {
+        warn('您正在使用仅运行时版本的Vue，其中模板编译器不可用。将模板预编译为渲染函数，或使用包含的编译器生成')
+      } else {
+        warn('组件挂载失败，template或者rener函数未定义')
+      }
+    }
   }
+  callHook(vm, 'beforeMount')
+  let updateComponent
+  if(process.env.NODE_ENV !== 'production' && config.performance && mark) {
+    updateComponent = function() {
+      var name = vm._name
+      var id = vm._uid
+      var startTag = 'vue-perf-start:' + id
+      var endTag = 'vue-perf-end:' + id
+      mark(startTag)
+      mark(endTag)
+      var vnode = vm._render()
+      measure(('vue'+name+'render'))
+    }
+  } else {
+    updateComponent = () => {
+      vm._update(vm._render(), hydrating)
+    }
+  }
+  new Watcher(vm, updateComponent, noop, {
+    before() {
+      if(vm._isMounted && !vm._isDestoryed) {
+        callHook(vm, 'beforeUpdate')
+      }
+    }
+  })
+}
+
+function normalizeProp(options, vm) {
+  const props = options.props
+  if(!props) return
+  const res = {}
+  let i, val, name
+  if(Array.isArray(props)) {
+    i = props.length
+    while(i--) {
+      val = props[i]
+      if(typeof val === 'string') {
+        name = camelize(val)
+        res[name] = { type: null}
+      } else if(process.env.NODE_ENV !== 'production') {
+        warn('数组中props必须是字符串')
+      }
+    }
+  } else if(isPlainObject(props)) {
+    for(var key in props) {
+      val = props[key]
+      name = camelize(key)
+      res[name] = isPlainObject(val) ? val : { type: val}
+    }
+  } else if(process.env.NODE_ENV !== 'production') {
+    warn('props应该是数组或者对象')
+  }
+  options.props = res
+}
+
+function normalizeInject(options, vm) {
+  const inject = options.inject
+  if(!inject) return
+  const normalized = inject = {}
+  if(Array.isArray(inject)) {
+    for(var i = 0; i < inject.length; i++) {
+      normalized[inject[i]] = { from: inject[i]}
+    }
+  } else if(isPlainObject(inject)) {
+    for(let key in inject) {
+      normalized[inject[i]] = { from: inject[i]}
+    }
+  } else if(process.env.NODE_ENV !== 'production') {
+    warn('inject必须是数组或者对象')
+  }
+}
+
+function normalizeDirectives(options) {
+  const dirs = options.directives
+  if(dirs) {
+    for(var key in dirs) {
+      const def$$1 = dirs[key]
+      if(typeof def$$1 === 'function') {
+        dirs[key] = { bind: def$$1, update: def$$1 }
+      }
+    }
+  }
+}
+
+function nextTick(cb, ctx) {
+  let _resolve
+  callbacks.push(function() {
+    if(cb) {
+      try {
+        cb.call(ctx)
+      } catch(e) {
+        handleError(e, ctx, 'nextTick')
+      }
+    } else if(_resolve) {
+      _resolve(ctx)
+    }
+  })
+  if(!pending) {
+    pending = true
+    timerFunc()
+  }
+  if(!cb && typeof Promise !== 'undefined') {
+    return new Promise(function(resolve) {
+      _resolve = resolve
+    })
+  }
+}
+function renderMixin(Vue) {
+  installRenderHelper(Vue.prototype)
+  Vue.prototype.$nextTick = function(fn) {
+    return nextTick(fn, this)
+  }
+  // _render得到的虚拟dom
+  Vue.prototype._render = function() {
+    const vm = this
+    const ref = vm.$options
+    const render = ref.render
+    const _parentVnode = ref._parentVnode
+    if(_parentVnode) {
+      vm.$scopedSlots = normalizeScopeSlots(_parentVnode.data.scopedSlots, vm.$slots, vm.$scopedSlots)
+    }
+    vm.$vnode = _parentVnode
+    let vnode
+    try {
+      currentRenderingInstance = vm
+      vnode = render.call(vm._renderProxy, vm.$createElement)
+    } catch(e) {
+      handleError(e, vm, 'render')
+      if(process.env.NODE_ENV !== 'production' && vm.$options.renderError) {
+        try {
+           vnode = vm.$options.renderError.call(vm._renderProxy, vm.$createElement, e)
+        } catch(e) {
+          handleError(e, vm, 'renderError')
+          vnode = vm._vnode
+        }
+      } else {
+        vnode = vm._vnode
+      }
+    } finally {
+      currentRenderingInstance = null
+    }
+    if(Array.isArray(vnode) && vnode.length === 1) {
+      vnode = vnode[0]
+    }
+    if(!(vnode instanceof vNode)) {
+      if(process.env.NODE_ENV !== 'production' && Array.isArray(vnode)) {
+        warn('渲染函数应返回单个根节点')
+      }
+      vnode = createEmptyVNode()
+    }
+    vnode.parent = _parentVnode
+    return vnode
+  }
+}
+
+export function set (target, key, val) {
+  if (Array.isArray(target) && isValidArrayIndex(key)) { // 是否是数组并且inde合理
+    target.length = Math.max(target.length, key) // 安全手段假设用户设置的key离谱，远大于数组长度，将来进行splice会出错
+    target.splice(key, 1, val) // 先把key对应的删了，再增加，就是替换
+    return val
+  }
+  if (key in target && !(key in Object.prototype)) { // 如果key已经是响应式的
+    target[key] = val
+    return val
+  }
+  const ob = target.__ob__
+  if (!ob) { // 如果ob存在，本身是响应式的
+    target[key] = val
+    return val
+  }
+  defineReactive(ob.value, key, val)
+  ob.dep.notify()
+  return val
 }
