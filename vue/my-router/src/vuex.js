@@ -2,18 +2,32 @@
 let Vue
 class Store {
   constructor(options) {
-    this._vm = new Vue({
-      data: {
-        $$state: options.state
-      }
-    })
     this._mutations = options.mutations
     this._actions = options.actions
     this.commit = this.commit.bind(this)
     this.dispatch = this.dispatch.bind(this)
-    this.getters = options.getters
-    console.log(options)
-
+    this._wrappedGetters = options.getters
+    const computed = {}
+    this.getters = {}
+    const store = this
+    Object.keys(this._wrappedGetters).forEach(key => {
+      const fn = store._wrappedGetters[key]
+      // 转化为computed无参数形式
+      computed[key] = function() {
+        return fn(store.state)
+      }
+      Object.defineProperty(store.getters, key, {
+        get: () => store._vm[key]
+      })
+    })
+    this._vm = new Vue({
+      data: {
+        $$state: options.state
+      },
+      computed: {
+        
+      }
+    })
   }
   get state () {
     return this._vm._data.$$state

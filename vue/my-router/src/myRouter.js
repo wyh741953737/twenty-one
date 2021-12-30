@@ -4,6 +4,7 @@ class VueRouter {
     this.$options = options
     // 将current变成响应式的，router-view能够重新渲染
     this.current = window.location.hash.slice(1) || '/'
+    console.log('=-=-', this.current)
     Vue.util.defineReactive(this, 'matched', [])
     this.match()
     window.addEventListener('hashchange', this.onHashChange.bind(this))
@@ -11,25 +12,30 @@ class VueRouter {
 
     this.routeMap = {}
     options.routes.forEach(route => {
-      this.routerMap[route.path] = route
+      this.routeMap[route.path] = route
     })
+    console.log('eroouteMap====', this.routeMap)
   }
   onHashChange () {
+    console.log('触发了onHashChange')
     this.current = window.location.hash.slice(1)
+    console.log('获取当前current', this.current)
     this.matched = []
   }
   // match方法可以递归遍历路由表
   match (routes) {
     routes = routes || this.$options.routes
+    console.log('routes----', routes)
     for (const route of routes) {
       if (route.path === '/' && this.current === '/') {
+        console.log('bianli', route)
         this.matched.push(route)
         return
       }
       if (route.path !== '/' && this.current.indexOf(route.path) !== -1) {
         this.matched.push(route)
         if (route.children) {
-          this.match
+          this.match(route.children)
         }
       }
     }
@@ -63,19 +69,20 @@ VueRouter.install = function (_vue) {
       let depth = 0
       let parent = this.$parent
       while (parent) {
+        console.log('$vnode.data==============', parent)
         const vNodeData = parent.$vnode && parent.$vnode.data
         if (vNodeData) {
           if (vNodeData.routerView) {
             depth++
           }
-          if(vNodeData.keepAlive && parent._inactive) {
-            _inactive = true
-          }
         }
-        parent = this.$parent
+        parent = parent.$parent
       }
-      const { routerMap, current } = this.$router
-      const component = routerMap[current].component
+      let component = null
+      const route = this.$router.matched[depth]
+      if(route) {
+        component = route.component
+      }
       return h(component)
     }
   })
