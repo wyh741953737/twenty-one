@@ -12,12 +12,17 @@
   <script>
     const obj = {
       a: {
-        b: {
-          c: '5'
+        child1: {
+          son: '曦曦'
         },
-        f: '6'
+        child2: {
+          son: '海洋'
+        }
       },
-      j: [1,2,3]
+      b: {
+        secondChild: 'haihong'
+      },
+      c: ['曦曦', '紫晨']
     }
     function def(obj, key, value, enumerable) {
       Object.defineProperty(obj, key, {
@@ -38,11 +43,11 @@
         enumerable: true,
         configurable: true,
         get() {
-          console.log('你访问了obj的' + key + '属性')
+          console.log('你访问了对象的' + key + '属性')
           return val
         },
         set(newValue) {
-          console.log('你在修改obj的' + key + '属性')
+          console.log('你在修改对象的' + key + '属性')
           if (val === newValue) return
           val = newValue
           childObj = observe(newValue)
