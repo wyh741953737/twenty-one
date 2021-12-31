@@ -120,3 +120,60 @@ vue中使用nextTick
 批量：如果同一个watcher被触发多次，只会被推入到队列中一次，在下一个事件循环tick中，Vue刷新队列执行实际工作
 异步策略：Vue在内部尝试promise.then,
 watcher往队列里面添加，
+
+### vue内部执行流程
+1: this._init(options)
+2: this._init: {
+  mergeOptions赋值给vm.$options
+  代理proxy(vm)
+  initLifeCycle: 给vm添加一些属性
+  initEvents: vm._enents 如果$options上有_parentListeners，执行updateComponentListeners
+  initRender：添加_vnode, $slots, $createElement等， 添加$attrs, $listeners
+  callHook(vm, 'beforeCreate'): 
+  initInjections: 
+  initState: 如果有props，methods， date， computed， watch 初始化
+  initProvide: 
+  callHook(vm, 'created')
+
+  $options上有el, 执行$mount挂载
+  vm.$mount(vm.$options.el)
+}
+3: $mount: {
+  查询到el元素
+  通过getOuterHTML得到template元素
+  通过compileToFunction(template) 得到render函数和staticRenderFns数组
+  执行mount.call(this, el, hydrating)
+}
+4: Vue.prototype.$mount {
+  执行mountComponent函数
+}
+            Vue.prototype._render执行得到的是vnode
+            Vue.prototype._update(将_vnode挂到vm，如果不存在prevVnode说明是根， vm.$el = vm._patch_(vm.$el, vnode, hydrating, false))
+            _update是将vdom变成真实dom
+            function patch(oldVnode, vnode, hydrating, removeOnly) {
+              用insertedVnodeQueue收集插入的vnode
+              打补丁，渲染到屏幕上
+            }
+5：mountComponent： {
+  vm.$el = el
+  callHook(vm, 'beforeMount')
+  条件判断得到updateComponent函数
+  updateComponent = function() {
+    vm._update(vm._render(), hydrating) ====》 vm._update(vnode, hydrating)
+  }
+  new Watcher(vm, updateComponent, noop, {before: function before() {
+    if(vm._isMounted && !vm._isDestoryed) {
+      callHook(vm, 'beforeUpdate')
+    }
+  }})
+  hydrating = true
+  vm.$vnode == null && vm._ismounted = true, callHook(vm, 'moundted')
+}
+6: Watcher {
+  vm._watchers.push(this) // this是watcher实例对象
+  watcher上加了getter = updateComponent
+  watcher.value = Watcher.prototype.get()
+  watcher还挂了vm
+   Watcher.prototype.get()内部主要是pushTarget，给Dep加target（watcher）
+   然后通过this.getter.call(vm, vm):其实是执行updateComponent,也就是vm._update(vnode, hydrating)得到值value
+}
