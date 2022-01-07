@@ -100,9 +100,39 @@ options上的components有keepAlive, Transition, TransitionGroup
 15: 初始化生命周期initLifeCycle(vm)
 16：初始化事件initEvents(vm)
 17: 初始化render函数initRender
-18： 执行callHook(vm, 'beforeCreate'), beforeCreate hook
+18： 执行callHook(vm, 'beforeCreate'),
 19: 初始化injection，
 20： 初始化state(props, methods, data, computed, watch)
+21: 初始化Provider
+22：执行callHook(vm, 'created')
+23: 如果有el， 执行vm.$mount(vm.$options.el)
+24: query查询到el对应html元素
+25： getOuterHTML得到html模板
+26： compileToFunction转化为具有render和staticRenderFns的对象
+27: 执行mount.call(this, el, hydrating)
+28: mount.call执行mountComponent开始挂载
+29： 执行callHook(vm, 'beforeMount')
+30:  给updateComponent赋值 = vm._update(vm._render(), hydrating)
+31:  执行new Watcher
+     callHook(vm, 'mounted')
+32： 给vm挂_watcher， vm.watchers.push(this), options上添加属性lazy,before,sync,id等等
+33:  将mountComponent赋值给this.getter, this是Watcher实例对象
+34： 执行Watcher.prototype.get，pushTarget(this)给Dep加target
+     执行value = this.getter.call(vm, vm) = vm._update(vm._render(), hydrating)
+     popTarget， this.clenupDeps, return value
+36:  _render内 vnode = render.call(vm._renderProxy, vm.$createElement)得到vnode
+37： _update内：vm._patch_， restoreActiveInstance， 
+38: _patch_内：oldVnode = emptyNodeAt(oldVnode) 
+    createElm(vnode, insertedVnodeQueue)渲染到了页面
+39：
+....
+flushCallbacks:
+  遍历执行callbacks[i]()
+flushScheduleQueue:
+  遍历， watcher=queue[index]
+  if watcher.before, callHook('beforeUpdate)
+  watcher.run
+  
 
 new Vue() => _init() => $mount() => mountComponent => new Watcher() => updateComponent => render() => _update()
 
