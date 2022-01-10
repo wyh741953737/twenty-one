@@ -12,55 +12,27 @@
 <body>
   <div id="app">
     <span>{{desc}}</span>
-    <Comp></Comp>
+    <!-- <Comp></Comp> -->
   </div>
   <script>
-    Vue.component('comp', {
-      template: '<h1>我是comp组件</h1>'
-    })
-    const app = new Vue({
-      el: '#app',
-      data: {
-        desc: '<span>你好啊</span>'
-      },
-      mounted() {
-        this.desc = '我是mount中同步变化11111'
-        this.$nextTick(() => {
-          alert(this.desc)
-        })
-      },
-    })
+    // Vue.component('comp', {
+    //   template: '<h1>我是comp组件</h1>'
+    // })
   </script>
   <script>
-    // 观察者：订阅者，watcher。   被观察者：被订阅的变量，依赖，deps
-    // 观察者模式：一对多，是一种行为模式，行为模式关注的是对象之间的通信，
-    // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件
-    // 发布订阅模式：订阅者把自己想订阅的事注册到调度中心，当发布者发布这个事件，由调度中心统一调度
-
     const watchers = []
-
-    // const arrayProto = Object.create(Array.prototype)
-    // ['push', 'pop', 'shift', 'unshift'].forEach(method => {
-    //   arrayProto[method] = function() {
-    //     Array.prototype[method].apply(this, arguments)
-    //     // 覆盖操作，通知更新
-    //     console.log('数组执行' + method + '操作')
-    //   }
-    // })
-
     function defineReactive(obj, key, val) {
-      // 创建Dep实例
       const dep = new Dep()
       observe(val)
       Object.defineProperty(obj, key, {
         get() {
-          console.log('get', key)
+          console.log('触发get====', key)
           // 依赖收集
           Dep.target && dep.addDep(Dep.target)
           return val
         },
         set(newVal) {
-          console.log('set', key)
+          console.log('触发set====', key)
           if (newVal !== val) {
             observe(newVal)
             val = newVal
@@ -71,7 +43,6 @@
     }
 
     class Dep {
-      // 观察者
       constructor() {
         this.deps = []
       }
@@ -105,7 +76,6 @@
         this.vm = vm
         this.key = key
         this.updateFn = updateFn
-        // watchers.push(this)
         Dep.target = this
         this.vm[this.key]
         Dep.target = null
@@ -147,12 +117,10 @@
       constructor(options) {
         this.$options = options
         this.$data = options.data
-
         // 响应式处理
         observe(this.$data)
         proxy(this)
-        // 编译
-        // 获取dom，遍历子元素（[编译节点，遍历属性[遍历k-开头（k-html处理innerHtml， k-model监听input）， 遍历at开头（绑定click）]], 编译文本
+        // 编译 获取dom，遍历子元素（[编译节点，遍历属性[遍历k-开头（k-html处理innerHtml， k-model监听input）， 遍历at开头（绑定click）]], 编译文本
         new Compile(options.el, this)
       }
     }
@@ -187,8 +155,7 @@
         const childNodes = el.childNodes
         childNodes.forEach(node => {
           if (node.nodeType === 1) {
-            // 元素, 判断属性
-            // 处理指令和事件
+            // 元素, 判断属性，处理指令和事件
             const attrs = node.attributes
             Array.from(attrs).forEach(attr => {
               // v-xxx='aaa'
@@ -253,6 +220,24 @@
         node.value = value
       }
     }
+    const app = new Vue({
+      el: '#app',
+      data: {
+        desc: '<span>你好啊</span>'
+      },
+      mounted() {
+        this.desc = '我是mount中同步变化11111'
+        setTimeout(() => {
+          this.desc = '定时器里面的内容'
+        }, 2000);
+      },
+    })
+  </script>
+  <script>
+        // 观察者：订阅者，watcher。   被观察者：被订阅的变量，依赖，deps
+        // 观察者模式：一对多，是一种行为模式，行为模式关注的是对象之间的通信，
+        // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件
+        // 发布订阅模式：订阅者把自己想订阅的事注册到调度中心，当发布者发布这个事件，由调度中心统一调度
   </script>
 </body>
 
