@@ -87,8 +87,17 @@ javascriptCore：解析，执行js代码
 
 V8引擎可以独立运行，也可嵌入到任何C++应用程序中
 
-js代码-parse解析为AST抽象语法树，ignation这个库转化为字节码（字节码是跨平台的）
-词法分析：tokens [{type: 'keyword', value: 'const'}，...]
+js代码-parse解析为AST抽象语法树，ignation这个库（解释器）转化为字节码（字节码是跨平台的）
+TurboFan（编译器）将字节码转化为CPU可以执行的机器码: 收集Ignition中使用频率高的函数，标记为hot，这个函数就会被转化为优化的机器码，之后执行效率就会很高，但是如果函数执行时，类型发生变化，机器码会被还原为字节码
+
+词法分析：tokens [{type: 'keyword', value: 'const'} ，...]
 语法分析：
 
 bable: 将ts转换为ast-》转换为新的ast-》generate code -》 js代码
+
+
+代码在V8引擎内部运行过程：
+1：解析：V8引擎会创建一个对象：Global Object，里面会放全局对象，比如Math，String，定时器等等
+2：运行代码：为了执行代码，先创建一个执行上下文栈，为了全局代码能够正常执行会创建一个全局执行上下文
+  全局执行上下文内部有vo：变量对象，
+  作用域提升：将变量放到GO
