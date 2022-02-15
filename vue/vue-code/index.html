@@ -22,7 +22,7 @@
   <script>
     const watchers = []
     function defineReactive(obj, key, val) {
-      const dep = new Dep()
+      const dep = new Dep() // key和Dep一一对应
       observe(val)
       Object.defineProperty(obj, key, {
         get() {
