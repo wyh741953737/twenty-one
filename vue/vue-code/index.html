@@ -11,7 +11,8 @@
 
 <body>
   <div id="app">
-    <span>{{desc}}</span>
+    <h1 v-html="desc"></h1>
+    <h2 v-html="desc2"></h2>
     <!-- <Comp></Comp> -->
   </div>
   <script>
@@ -36,7 +37,7 @@
           if (newVal !== val) {
             observe(newVal)
             val = newVal
-            dep.notify()
+            dep.notify() // 数据发生改变通知界面变化
           }
         }
       })
@@ -223,15 +224,12 @@
     const app = new Vue({
       el: '#app',
       data: {
-        desc: '<span>你好啊</span>'
-      },
-      mounted() {
-        this.desc = '我是mount11'
-        setTimeout(() => {
-          this.desc = '定时器里面的内容'
-        }, 2000);
-      },
+        desc: '<span>你好啊</span>',
+        desc2: '<span>你好啊</span>'
+      }
     })
+    console.log(app)
+    app._data.desc = '<span>我变身了</span>'
       // 观察者：订阅者，watcher。   被观察者：被订阅的变量，依赖，deps
         // 观察者模式：一对多，是一种行为模式，行为模式关注的是对象之间的通信，
         // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件
