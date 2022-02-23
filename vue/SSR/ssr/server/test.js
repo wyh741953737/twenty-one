@@ -9,7 +9,13 @@ server.use(favicon(path.join(__dirname, '../public/favicon.ico')))
 
 server.get('*', (req, res) => {
   const template = req.url.substr(1) || 'index'
-  const buffer = fs.readFileSync(path.join(__dirname))
+  const buffer = fs.readFileSync(path.join(__dirname, `${template}.html`))
+  const app = new Vue({
+    template: buffer.toString(),
+    data() {
+      return { msg: '' }
+    }
+  })
 })
 
 server.listen(3000, () => {

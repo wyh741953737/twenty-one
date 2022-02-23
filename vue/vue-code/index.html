@@ -11,15 +11,9 @@
 
 <body>
   <div id="app">
-    <h1 v-html="desc"></h1>
+    <h1 v-html="desc.text"></h1>
     <h2 v-html="desc2"></h2>
-    <!-- <Comp></Comp> -->
   </div>
-  <script>
-    // Vue.component('comp', {
-    //   template: '<h1>我是comp组件</h1>'
-    // })
-  </script>
   <script>
     const watchers = []
     function defineReactive(obj, key, val) {
@@ -89,15 +83,6 @@
 
     function observe(obj) {
       if (typeof obj !== 'object' || obj === null) return
-      // if(Array.isArray(obj)) {
-      //   obj.__proto__ = arrayProto // 覆盖原型，替换7个变更操作
-      //   // 对数组内部元素执行响应式
-      //   const keys = Object.keys(obj)
-      //   for(let i = 0; i < obj.length; i++) {
-      //     observe(obj[i])
-      //   }
-      // } else {
-      // }
       new Observer(obj)
     }
 
@@ -224,12 +209,14 @@
     const app = new Vue({
       el: '#app',
       data: {
-        desc: '<span>你好啊</span>',
+        desc: {
+          text: '<span>你好啊</span>'
+        },
         desc2: '<span>你好啊</span>'
       }
     })
     console.log(app)
-    app._data.desc = '<span>我变身了</span>'
+    app._data.desc.text = '<span>我变身了</span>'
       // 观察者：订阅者，watcher。   被观察者：被订阅的变量，依赖，deps
         // 观察者模式：一对多，是一种行为模式，行为模式关注的是对象之间的通信，
         // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件

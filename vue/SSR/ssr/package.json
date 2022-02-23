@@ -10,7 +10,8 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "serve-favicon": "^2.5.0",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "vue-router": "^4.0.12"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.13",

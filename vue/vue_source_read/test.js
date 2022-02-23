@@ -484,9 +484,7 @@ var Observer = function Observer(value) {
     }
     this.observeArray(value)
   } else {
-    this.walk(value
-      
-      )
+    this.walk(value)
   }
 }
 Observer.prototype.walk = function walk(obj) {
