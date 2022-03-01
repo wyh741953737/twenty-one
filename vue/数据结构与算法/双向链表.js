@@ -71,6 +71,31 @@ function DoublyLinkedList() {
     }
     this.length++
   }
+  DoublyLinkedList.prototype.remove = function(position) {
+    if(position < 0 || position >= this.length) return null
+    // 如果删除链表头
+    if(this.length === 0) {
+      this.head = null
+      this.tail = null
+    } else {
+      if(position === 0) {
+        this.head.next.prev = null
+        this.head = this.head.next
+      } else if(position === this.length-1) {
+        this.tail.prev.next = null
+        this.tail = this.tail.prev
+      } else {
+        let index = 0
+        while(index++ < position) {
+          current = current.next
+        }
+        current.prev.next = current.next
+        current.next.prev = current.prev
+      }
+    }
+    this.length--
+    return current.data
+  }
 
 }
 
