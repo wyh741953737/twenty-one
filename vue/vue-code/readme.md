@@ -108,3 +108,28 @@ watcher往队列里面添加，
 优化optimize
 优化器：在AST中找出静态子树并打上标记，静态子树是在AST中永远不变的节点，比如纯文本节点
 标记静态字树的好处：每次重新渲染，不需要为静态子树创建新节点，虚拟DOM中patch时，可以跳过静态子树（isStatic，比如:必须嵌套<p>nihao<span>test</span></p>）
+
+initState内部
+1） 执行initData(vm) { data = getData(data) {pushtarget() return data.call(vm,vm)}}
+data=mergedInstanceDataFn() {}
+  Object.keys(data) =>是你写的data对象的key data={desc: {text: '<span>你好啊</span>', obj: { a: 'A' }}}
+  proxy(vm, "_data", key)
+  observe(data, true) {
+    如果data有_ob_说明做过双向绑定， ob=data.__ob__
+    否则：ob=new Observer(data)
+    Oberver(data) {
+      this.dep = new Dep() 第一次给{str, obj:{a:'A',b:'B'}}注册Dep，第二次给{a: 'A', b: 'B'}注册Dep
+      给data定义__ob__
+      区分对象或者数组
+      对每个key执行defineReactive，遍历。。this.walk
+    }
+    defineReactiv{
+      const dep = new Dep() 第一次给str: '你好啊'， 第二次obj对象obj: {a: 'A', b: 'B'}，第三次a: 'A'
+      childOb = !isShallow && observe('你好啊'), 第二次执行observe({a:'A',b:'B'}) 又去了Observe
+      Object.defineProperty(obj, key, { 给{a:'A',b:'B'}定义
+        get: () {
+          执行getter得到value，如果Dep.target又值，dep.append添加依赖， 如果childOb有值，给子值添加以来
+        }
+      })
+    }
+  }
