@@ -7,37 +7,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script src="https://unpkg.com/vuex@2.0.0"></script>
 </head>
 
 <body>
   <div id="app">
-    <h1 v-html="str"></h1>
-    <h2 v-html="obj.a"></h2>
-    <h1 id="s"></h1>
+    <h1 v-html="str" @click="clickStr" id="h1s"></h1>
+    <h2>{{type}}</h2>
   </div>
   <script>
-  const app = new Vue({
+  const store = new Vuex.Store({
+    state: {
+      count: 0
+    },
+    mutations: {
+      increment (state) {
+        state.count++
+      }
+    }
+  })
+  new Vue({
       el: '#app',
       data: {
         str: '你好啊',
-        obj: {
-          a: 'B',
-          b: 'B'
-        },
-        state: {
-          
+        type: ''
+      },
+      methods: {
+        clickStr() {
+          this.type = store.state.count
+          this.$nextTick(() => {
+             document.getElementById('h1s').innerHTML = '哈哈哈'
+          })
         }
-      }
+      },
+      mounted() {
+        console.log('==========', store.state.count)
+      },
     })
-    app.$set(app._data.obj, 'myset', 1)
-    document.getElementById('s').innerHTML = app._data.obj.myset
-    console.log(app.$set)
-    app._data.str = '我不好'
-    app._data.obj.a = '<span>我变身了</span>'
       // 观察者：订阅者，watcher。   被观察者：被订阅的变量，依赖，deps
         // 观察者模式：一对多，是一种行为模式，行为模式关注的是对象之间的通信，
         // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件
         // 发布订阅模式：订阅者把自己想订阅的事注册到调度中心，当发布者发布这个事件，由调度中心统一调度
+ 
   </script>
   <script>
 
