@@ -47,15 +47,50 @@ VueComponent：你定义一个组件，本质是VueComponent的构造函数，�
 组件配置中，data，methods，watch，compouted中的this都是VueComponent， new Vue配置中，data，methods中的this是Vue实例
 Vue.extend = function(extendOptions) { const sub = function VueComponent(options) { this._init(options)  return Sub  }
 内置关系： VueComponent.prototype.__proto__ === Vue.prototype 可以让组件实例对象VC可以访问到Vue原型上的属性，方法
-
-
-
-
-
-
-
-
-
+残缺版Vue.runtime.xxx.js运行时版本，new Vue中options中不能写template，没有模板解析器
+完整版Vue.js，包含核心功能+模板解析器
+ref: ref写在子组件中是VueComponent， 通过document.getElememtById取到的是子组件html元素
+mixin: 可以将多个组件公用的代码抽离，实现代码复用，在配置项中：mixins:[xxxx]. 也可以全局引入Vue.mixin(xx)
+插件：plugins本质上对象吗，要有install方法，vue会帮你调用， plugin可以增强vue， plugin第一个参数是vue，后面自己传参
+scoped：样式覆盖看引入的顺序，import A， B，这样A,B中有相同类名，B会覆盖A的样式。其实就是给最外层div加了一个data-v-xxxx，xxx是随机数，配合属性选择器.demo[data-v-xxx] {} 实现
+但是App组件不适用scoped，会全局生效
+组件自定义事件：一种组件间通信的方式，适用于子组件===》父组件不能实现兄弟间
+绑定自定义事件1：this.$emit('事件名',事件参数）子传父， 父传子：props， props也可以是函数，子组件中接收后调用
+绑定自定义事件2：ref。父组件引用了子组件<Student ref="student' /> 父组件mounted内部： this.$refs.student.$on('getName', this.getStudentName)，监听子组件getName事件触发后调用this.getStudentName方法
+通过ref事件绑定灵活性强
+用第一种事件绑定，当模板解析的时候，@augui=“getStudentName” 就绑定好了，如果需求是等ajax请求回来后再绑定，第一种写法就做不到，第二种可以将绑定放定时器上
+解绑自定义事件： this.$off('getName')解绑一个 this.$off(['xx', 'xxx])解绑多个， this.$off()解绑所有
+组件绑定原生DOM事件：父组件给子组件绑定原生click事件时， 要加native修饰
+全局事件总线：实现任意组件间通信。要符合什么条件才能实现事件总线？
+一般跨层级时候用，不用一层层传
+1：所有人都能看见，
+vue.prototype == VueComponent.__proto__ 所以可以将事件总线定义在Vue的原型上。放在window上不行，放在VueComponent上，因为VC是通过Vue.extend生成的，每次都不一样
+2：能调用到$on, $off, $emit
+vc中this能够调用到$emit,$on因为这些都挂载在vue的原型上。我们将它挂到vm上
+new Vue({ el:'#app', render: h=>h(App), beforeCreate() { Vue.prototype.$bus = this } )
+在组件中：this.$bus.$on('hello', ()=> {}) 自定义组件的时候没有在销毁时解绑，因为组件销毁，vc都没了.自定义事件没了
+但是全局事件总线建议 在组件销毁的时候注销事件，因为当前组件销毁，但是事件总线还在
+全局事件总线就是自定义事件，只是给$bus绑定的， 也就是vm
+消息订阅与发布：pubsub，安装一下：npm i pubsub-js
+pubsub.subscribe('haha', () => {})
+pubsub.public('haha', 555)
+$nextTick: 在下一次dom更新结束后执行指定的回调。vue不会数据变就立马去解析模板，比如input获取焦点，使用时机：要基于更新dom后执行某些操作，要在nextTick中执行
+Vue动画：<transition> v-enter-active:进入时候激活的样式，v-leave-active:离开动画  每个国度还可以取名字比如hello， 样式中要用hello-enter-active
+transition最后没有形成真正的dom元素 v-enter:进入起点， vv-enter-to：进入的终点。 v-leave:离开的起点。 v-leave-to离开的终点
+vue动画给了6个样式名，进入三个：进入的起点v-enter，进入时：v-enter-active， 进入的终点：v-enter-to
+多个动画使用transition-group，，里面的每个元素都要匹配一个key
+第三方集成的：animate.css  安装： npm i animate.css
+页面中引入：import ’animate.css'
+在<transition-group appear name="animate__animated animate__bounce" enter-active-class="animate_swing">
+ajax请求： 都是基于xhr， jquery封装了xhr， axios基于promise支持请求拦截和响应拦截体积小，fetch和xhr是同级的，也是基于promise但是会返回2层promise，fetch兼容性不好，ie不兼容。vue-resource插件，发请求的库
+代理：cors实现跨域，后端配置。jsonp借助script只能get前后端要配合。代理服务器：服务器之间打交道不用ajax，ajax是前端技术，服务器用http。nginx 
+vue-cli能够开启代理服务器：devServer: { proxy: 'http://loalhost:5000' }
+方式二：devServer: { proxy: { '/api': { target: 'xxx', ws: true, changeOrigin: true},pathRewrite: { '^/atguigu': '' '}  changeOrigin用于控制请求头中的host，默认是true
+插槽：作用：让父组件可以向子组件指定位置插入html结构，也是组件间通信方式父==》子。
+默认插槽，具名插槽：v-slot：footer只能用在template中。老的用slot=”footer“，
+作用域插槽：数据在组件自身，但根据数据生成的结构需要组件的使用者决定，外侧必须包裹template，<template scope="{hello}"> {{games}----{{gae}}</template> 新写法：<template solt- ="{games}">
+作用域体现在：父组件没有数据，是子组件传过来的。
+Vuex：集中式管理，任意组件通信方式。多个组件依赖同一状态，或者来自不同的行为需要变更同一状态
 
 
 

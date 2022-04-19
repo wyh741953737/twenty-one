@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    html {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      height: 100%;
+      background: #fff;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.querySelector('#canvas')
+    const ctx = canvas.getContext('2d')
+    const h = document.documentElement.clientHeight - 6
+    const w = document.documentElement.clientWidth - 6
+    canvas.height = h
+    canvas.width = w
+
+    function Ball (x, y) {
+      this.x = x
+      this.y = y
+      this.r = 50
+      this.color = '#' + parseInt(Math.random() * 0xffffff).toString(16)
+    }
+    Ball.prototype.show = function () {
+      if (this.r > 0) {
+        this.r--
+        drawCircle(this.x, this.y, this.r, this.color)
+      }
+    }
+    function drawCircle (x, y, r, color) {
+      ctx.beginPath()
+      ctx.arc(x, y, r, 0, Math.PI * 2)
+      ctx.closePath()
+      ctx.fillStyle = color || '#000'
+      ctx.fill()
+    }
+    const position = []
+    window.addEventListener('mousemove', (e) => {
+      const ball = new Ball(e.x, e.y)
+      position.push(ball)
+      ball.show()
+    })
+    setInterval(() => {
+      ctx.clearRect(0, 0, w, h)
+      for (let i = 0; i < position.length; i++) {
+        if (position[i].r <= 0) { // 半径为0的删除
+          position.splice(i, 1)
+        } else {
+          position[i].show()
+        }
+      }
+    }, 10)
+  </script>
+</body>
+
+</html>
