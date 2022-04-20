@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    function Parent (name) {
+      this.name = name
+      this.hobby = []
+      this.sayHello = function () { }
+    }
+    Parent.prototype.sayName = function () {
+      console.log(this.name)
+    }
+
+    // 原型链继承: 构造函数中的引用类型原型改变所有实例都变，因为两个Child实例使用同一个原型对象，内存共享不能传参
+    function Child (age) {
+      this.age = age
+    }
+    Child.prototype = new Parent()
+    console.log(new Child(12))
+
+    // 构造函数继承: 通过call将父构造函数的属性和方法添加到子构造函数上。但是父构造函数原型的方法不能访问。能给父构造函数传参
+    function ChildCtr (age, name) {
+      Parent.call(this)
+      this.age = age
+    }
+    const child = new Child(12, 'xixi')
+    // 组合继承：通过构造函数继承，继承父构造函数上面的属性和方法，通过原型继承继承父构造函数原型上的属性和方法，缺点：父构造函数被调用2次，多构造一次就造成了内存开销。
+    function ChildComp (age, name) {
+      Parent.call(this, name)
+      this.age = age
+    }
+    ChildComp.prototype = new Parent()
+    ChildComp.prototype.constructor = ChildComp
+    // 原型式继承: 可以继承普通对象的属性方法，Object.create可以为一些对象实现浅拷贝的。缺点：多个实例的引用类型指向相同内存，存在篡改可能。
+    const parent = {
+      name: 'xxx',
+      getName: function () {
+        return this.name
+      }
+    }
+    const p = Object.create(parent)
+    // 寄生式继承: 使用原型式继承获得目标对象的浅拷贝，利用浅拷贝能力增强。优缺点和原型是继承一样，
+    function inhert (Child, Parent) {
+      Child.prototype = Object.create(Parent.prototype)
+      Child.prototype.constructor = child
+    }
+
+    // 寄生组合继承：
+    function clone (parent, child) {
+      child.prototype = Object.create(parent.prototype)
+      child.prototype.constructor = child
+    }
+    function ChildBest (age, name) {
+      Parent.call(this)
+    }
+    clone(Parent, ChildBest)
+
+    // extends实现继承:构造函数继承加原型继承的语法糖，
+    class PersonC {
+      constructor(name) {
+        this.name = name
+      }
+      getName = function () { }
+    }
+    class Gamer extends PersonC {
+      constructor(name, age) {
+        super(name) // 
+      }
+    }
+
+    // bind
+    function myBind (thisArg, args) {
+      if (typeof this !== 'function') {
+        throw new Error('不是一个函数')
+      }
+      const self = this
+      const construct = function () {
+        const _this = this instanceof self ? this : thisArg
+        return self.apply(_this, args.concat(Array.prototype.slice.apply(arguments)))
+      }
+      function fn () { }
+      fn.prototype = self.prototype
+      construct.prototype = new fn()
+      return construct
+    }
+    // new
+    function myNew () {
+      const obj = new Object()
+      obj.__proto__ = Constructor.prototype
+      const result = Constructor.apply(obj, [...arguments])
+      return typeof result === 'object' ? result : obj
+    }
+    // promise
+    (function () {
+      function Promise (excutor) {
+        const PENDING = 'penging'
+        const RESOLVED = 'resolved'
+        const REJECT = 'reject'
+
+        this.status = PENDING
+        this.callbacks = []
+        this.data = undefined
+        const that = this
+        function resolve (value) {
+          if (that.status !== PENDING) return
+          that.status = RESOLVED
+          that.data = value
+          if (that.callbacks.length > 0) {
+            that.callbacks.forEach(cb => {
+              setTimeout(() => {
+                cb.onResolve(value)
+              })
+            })
+          }
+        }
+        function reject (reason) {
+          that.status = REJECT
+          that.data = reason
+          if (that.callbacks.length > 0) {
+            that.callbacks.forEach(cb => {
+              setTimeout(() => {
+                cb.onReject(reason)
+              })
+            })
+          }
+        }
+        try {
+          excutor(resolve, reject)
+        } catch (err) {
+          reject(err)
+        }
+      }
+      Promise.resolve = function (value) {
+        return new Promise((resolve, reject) => {
+          if (value instanceof Promise) {
+            value.then(v => resolve(v))
+          } else {
+            resolve(value)
+          }
+        })
+      }
+      Promise.all = function (promises) {
+        let count = 0
+        let data = new Array(promises.length)
+        return new Promise((resolve, reject) => {
+          promises.forEach((promise, index) => {
+            Promise.resolve(promise).then(
+              value => {
+                count++
+                data[index] = value
+                if (count === promises.length) {
+                  resolve(data)
+                }
+              },
+              reason => {
+                reject(reason)
+              }
+            )
+          })
+        })
+      }
+      Promise.race = function (promises) {
+        return new Promise((resolve, reject) => {
+          promises.forEach(p => {
+            Promise.resolve(p).then(resolve, reject)
+          })
+        })
+      }
+      Promise.prototype.then = function (onResolve, onReject) {
+        onResolve = typeof onReject === 'function' ? onResolve : v => v
+        onReject = typeof onReject === 'function' ? onReject : r => { throw Error }
+        const that = this
+        return new Promise((resolve, reject) => {
+          function handler (cb) {
+            const value = cb(that.data)
+            try {
+              if (value instanceof Promise) {
+                value.then(v => {
+                  resolve(v)
+                })
+              } else {
+                resolve(value)
+              }
+            } catch (err) {
+              reject(err)
+            }
+          }
+          if (that.status === PENDING) {
+            that.callbacks.push({
+              onResolve () { handler(onResolve) },
+              onReject () { handler(onReject) }
+            })
+          } else if (that.status === RESOLVED) {
+            setTimeout(() => {
+              handler(onResolve)
+            })
+          } else {
+            setTimeout(() => {
+              handler(onReject)
+            })
+          }
+        })
+      }
+    })(window)
+
+    // 将树转成dom
+    const tree = {
+      tag: 'div',
+      children: [
+        {
+          tag: 'div',
+          children: [
+            { tag: 'a', children: [] }
+          ]
+        },
+        {
+          tag: 'div',
+          attrs: { style: "color: 'red'" },
+          children: []
+        }
+      ]
+    }
+    function render (vnode) {
+      if (typeof vnode === 'number') {
+        vnode = String(vnode)
+      }
+      if (typeof vnode === 'string') {
+        return document.createTextNode(vnode)
+      }
+      const dom = document.createElement(vnode.tag)
+      if (vnode.attrs) {
+        Object.keys(vnode.attrs).forEach(key => {
+          const value = vnode.attrs[key]
+          dom.setAttribute(key, value)
+        })
+      }
+      vnode.children.forEach(child => dom.appendChild(render(child)))
+      return dom
+    }
+    // 发布订阅
+  </script>
+</body>
+
+</html>
