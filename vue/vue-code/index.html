@@ -6,8 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-  <script src="https://unpkg.com/vuex@2.0.0"></script>
+  <script src="./vue.js"></script>
 </head>
 
 <body>
@@ -31,14 +30,14 @@
       },
       watch: {
         type: {
-          immediate: true,
           deep: true,
           handler: (newVal) => {
-            console.log('====================', newVal)
+           alert('====================', newVal)
           }
         }
       },
       mounted() {
+        this.type.name = '我在mounted改了数据'
         alert(this.type.name)
       },
     })
