@@ -3,7 +3,7 @@ module.exports = {
   mode: 'development',
   entry: './src/index.js',
   output: {
-    filename: 'bundle.js'
+    filename: 'index.js'
   },
   devServer: {
     contentBase: path.join(__dirname, 'www'), // 静态文件根目录

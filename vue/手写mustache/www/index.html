@@ -8,11 +8,12 @@
 </head>
 <body>
   <h1>我是index.html</h1>
-  <script src="/xuni/bundle.js"></script>
+  <script src="/xuni/index.js"></script>
   <script>
     let data = {}
-    let templateStr = '我买了一个{{thing}}, 好{{mod}}啊'
-    TemplateEngine.render(templateStr, data)
+    let templateStr = '<div>我买了一个{{thing}}, 好{{mod}}啊</div>'
+    window.TemplateEngine.render(templateStr, data)
+    // [['text', '<div>我买了一个']，['name', 'thing'], ['text', ',好']，['name', 'mod'],['text', '啊</div>']]
   </script>
 </body> 
 </html>
