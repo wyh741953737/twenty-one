@@ -7,11 +7,34 @@
   <title>Document</title>
 </head>
 <body>
-  <h1>我是index.html</h1>
   <script src="/xuni/index.js"></script>
   <script>
-    let data = {}
-    let templateStr = '<div>我买了一个{{thing}}, 好{{mod}}啊</div>'
+    let data = [
+      { name: '小铭', hobbies: ['唱歌', '跳舞']},
+      { name: '小红', hobbies: ['学习', '跳舞'] }
+    ]
+    let dataObj = {
+      person: {
+        name: '小铭',
+        age: 12
+      }
+    }
+    let templateStr = `
+      <div>
+        <ul>
+          {{#students}}
+          <li>学生{{name}}的爱好是
+            <ul>
+              {{#hobbies}}
+              <li>{{.}}</li>
+              {{/hobbies}}
+            </ul>  
+          </li>
+          {{/students}}
+        </ul>  
+      </div>
+    `
+    let templateStr2 = '<div>我的名字是{{person.name}},年龄是{{person.age}}'
     window.TemplateEngine.render(templateStr, data)
     // [['text', '<div>我买了一个']，['name', 'thing'], ['text', ',好']，['name', 'mod'],['text', '啊</div>']]
   </script>

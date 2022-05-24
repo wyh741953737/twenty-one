@@ -14,12 +14,15 @@ export default class Scanner {
   scanUntil (stopTag) {
     const pos_backup = this.pos
     // 开头不是stopTag时
-    while(this.tail.indexOf(stopTag) != 0 && this.pos < this.templateStr.length) {
+    while(!this.eos() && this.tail.indexOf(stopTag) != 0) {
       // 尾巴开头不是stopTag时候，说明还没扫描到stopTag
       this.pos++
       this.tail = this.templateStr.substring(this.pos) // 改变尾巴为当前字符的开始，到最后的字符
     }
     // 指针扫描，遇到指定内容结束，并且返回结束之前路过的文字
     return this.templateStr.substring(pos_backup, this.pos)
+  }
+  eos () {
+    return this.pos >= this.templateStr.length
   }
 }
