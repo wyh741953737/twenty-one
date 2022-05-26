@@ -1,6 +1,5 @@
 // 将tokens折叠，一维数组变成二维数组
 export default function nestTokens(tokens) {
-  // 
   let resultTokens = []
   let collector = resultTokens
   let stack = []

@@ -10,15 +10,9 @@
   <script src="/xuni/index.js"></script>
   <script>
     let data = [
-      { name: '小铭', hobbies: ['唱歌', '跳舞']},
-      { name: '小红', hobbies: ['学习', '跳舞'] }
+      { name: 'Eileen', hobbies: ['sing', 'dance', 'knock code'] },
+      { name: 'John', hobbies: ['study', 'dance'] }
     ]
-    let dataObj = {
-      person: {
-        name: '小铭',
-        age: 12
-      }
-    }
     let templateStr = `
       <div>
         <ul>
@@ -26,7 +20,7 @@
           <li>学生{{name}}的爱好是
             <ul>
               {{#hobbies}}
-              <li>{{.}}</li>
+                <li>{{.}}</li>
               {{/hobbies}}
             </ul>  
           </li>
@@ -34,9 +28,7 @@
         </ul>  
       </div>
     `
-    let templateStr2 = '<div>我的名字是{{person.name}},年龄是{{person.age}}'
     window.TemplateEngine.render(templateStr, data)
-    // [['text', '<div>我买了一个']，['name', 'thing'], ['text', ',好']，['name', 'mod'],['text', '啊</div>']]
   </script>
 </body> 
 </html>

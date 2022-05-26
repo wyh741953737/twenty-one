@@ -5,7 +5,6 @@
 //  keyName: person.name  keys: ['person', 'age']
 // data: { person: {name: '小明', age: 12 } }
 export default function lookup(dataObj, keyName) {
-  console.log('lookup接受到的数据', dataObj, keyName)
   // 区分dataObj是数组还是对象
   if(keyName.indexOf('.') > 1) {
     let keys = keyName.split('.')
