@@ -11,6 +11,6 @@ window.TemplateEngine = {
     const tokensTwo = nestTokens(tokensOne)
     console.log(tokensTwo)
     const t = renderTemplate(tokensTwo, data)
-    console.log('----', t)
+    console.log(t)
   }
 }
