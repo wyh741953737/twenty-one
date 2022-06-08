@@ -1,8 +1,5 @@
 import Vue from 'vue'
-import App from './App.vue'
-import router from './router';
 import {registerApplication, start} from 'single-spa'
-import { reject, resolve } from 'core-js/fn/promise';
 
 Vue.config.productionTip = false
 
