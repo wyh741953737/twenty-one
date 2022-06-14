@@ -18,11 +18,14 @@ if (!window.__POWERED_BY_QIANKUN__) { // 如果是独立运行就直接render
 if (window.__POWERED_BY_QIANKUN__) {
   __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
 }
+// 只会在微应用初始化的时候调用一次，下次进入直接调用mount，这里通常做一些全局变量的初始化
 export async function bootstrap() { };
+// 应用每次进入都会调用mount方法，
 export async function mount(props) {
   console.log('vue父应用传过来的参数', props)
   render(props)
 }; // porops是父应用传过来的，全局api通信用的
+// 卸载微应用的应用实例
 export async function unmount(props) {
   instance.$destory();
 };

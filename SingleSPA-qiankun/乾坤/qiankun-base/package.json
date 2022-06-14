@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "caniuse-lite": "^1.0.30001335",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.5",
     "qiankun": "^2.4.9",
@@ -20,3 +21,4 @@
     "vue-template-compiler": "^2.6.11"
   }
 }
+

@@ -11,8 +11,9 @@
 
 <body>
   <div id="app">
-    <h1 v-html="str" @click="clickStr" id="h1s"></h1>
-    <h2>{{type}}</h2>
+    <!-- <h1 v-html="str" @click="clickStr" id="h1s"></h1>
+    <h2>{{type}}</h2> -->
+    <h2 v-pre>{{str}}</h2>
   </div>
   <script>
   new Vue({
@@ -37,8 +38,8 @@
         }
       },
       mounted() {
-        this.type.name = '我在mounted改了数据'
-        alert(this.type.name)
+        // this.type.name = '我在mounted改了数据'
+        // alert(this.type.name)
       },
     })
       // 观察者：订阅者，watcher。   被观察者：被订阅的变量，依赖，deps

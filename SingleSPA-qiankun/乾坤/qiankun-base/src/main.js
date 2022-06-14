@@ -8,14 +8,14 @@ import { registerMicroApps, start } from 'qiankun'
 const apps = [
   {
     name: 'vueapp',
-    entry: '//localhost:1000',// 默认会加载这个html，解析里卖弄的js，动态执行，子应用必须支持跨域
+    entry: '//localhost:1000',// 默认会加载这个html，解析里面的js，动态执行，子应用必须支持跨域
     container: '#vue',
     activeRule: '/vue', // 激活的路径
     props: { name: 'xixi', age: 22}
   },
   {
     name: 'reactapp',
-    entry: '//localhost:2000',// 默认会加载这个html，解析里卖弄的js，动态执行，子应用必须支持跨域
+    entry: '//localhost:2000',// 默认会加载这个html，解析里面的js，动态执行，子应用必须支持跨域
     container: '#react',
     activeRule: '/react',
     props: { name: 'xixi', age: 22}
