@@ -19,7 +19,6 @@ export default function (sel, data, c) {
         throw new Error('传入的数组参数中有一项不是h函数')
       }
       children.push(c[i])
-      console.log(children)
     }
     return vnode(sel, data, children, undefined, undefined)
    } else if(typeof c === 'object' && c.hasOwnProperty('sel')) {
