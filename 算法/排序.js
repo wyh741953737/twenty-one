@@ -100,3 +100,10 @@ function findMax(arr, l,r) {
   const rightmax = findMax(arr, mid+1, r)
   return Math.max(leftmax, rightmax)
 }
+
+// master公式
+// T(N) = a*T(N/b)+O(N^d) 
+// T(N)是母函数，a是次，T(N/b)是子过程，O(N^b)是除了子过程之外的代码
+// 比如上面的函数，findMax是母函数，T(N), 递归调用自己的次数是2次，每次N/2次（子过程规模是N/2)，其他的代码执行是O(1) 所以T(N)=2*T(N/2)+O(1)
+// 当b=2，d=0，a=2的时候，findMax函数满足master公式
+// 满足以上条件的递归，时间复杂度
