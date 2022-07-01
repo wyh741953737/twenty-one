@@ -1,18 +1,18 @@
 <template>
   <div id="app">
-    <filter-comp />
+    <!-- <filter-comp /> -->
     <instruct-comp />
   </div>
 </template>
 
 <script>
-import FilterComp from './view/filters.vue'
+// import FilterComp from './view/filters.vue'
 import InstructComp from './view/instruct.vue'
 
 export default {
   name: 'App',
   components: {
-    'filter-comp': FilterComp,
+    // 'filter-comp': FilterComp,
     'instruct-comp': InstructComp
   }
 }

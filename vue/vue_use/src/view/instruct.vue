@@ -1,6 +1,7 @@
 <template>
   <div>
-    <h1 @click="clickDom">测试</h1>
+    <div style="color: red">vue中提供两种指令：一种是内置指令，另一种是自定义指令。所有的指令都是以 v- 开头的<br/>常用的内置指令有v-show、v-if、v-else、v-for、v-model、v-on、v-bind、v-cloak、v-text、v-html、v-once、v-pre等</div>
+    <!-- <h1 @click="clickDom">测试</h1>
     <div v-html="html"></div>
     <div v-text="html"></div>
     <h1 v-cloak>{{cloak}}</h1>
@@ -8,23 +9,24 @@
     <h3>{{once}}</h3>
     <h2 v-pre>{{pre}}</h2>
     <h3 v-big>我是自定义指令</h3>
-    <h3 v-focus>我是focus自定义指令{{once}}</h3>
+    <h3 v-focus>我是focus自定义指令{{once}}</h3> -->
+    <br/><br/>
      <label v-for="item in originhobbies" :for="item" :key="item">
       <input type="checkbox" :value="item" :id="item" v-model="hobbies">{{item}}
     </label>
-    <button v-copy="hobbies">复制</button>
-    <div>
+    <button v-copy="hobbies">自定义指令-复制</button>
+    <!-- <div>
       <h2>权限校验</h2>
       <button v-permission="1">权限按钮1</button>
       <button v-permission="9">权限按钮1</button>
-    </div>
-    <div style="marginTop: 40px">
+    </div> -->
+    <!-- <div style="marginTop: 40px">
       <button v-draggable>测试拖拽</button>
-    </div>
-    <h1 v-longPress="longPress">长按</h1>
-    <div class="img-wrap" v-for="item in urls" :key="item">
+    </div> -->
+    <!-- <h1 v-longPress="longPress">长按</h1> -->
+    <!-- <div class="img-wrap" v-for="item in urls" :key="item">
       <img alt="" v-lazyLoad="item" />      
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -34,7 +36,6 @@ export default {
   data () {
     return {
       cloak: '网速慢的时候将未经解析的模板隐藏',
-      name: '指令',
       once: 'once初次渲染后就不再进行结构的更新',
       pre: 'pre会跳过其节点编译过程，跳过没有使用指令和插值语法的节点，加快编译',
       html: '<h1>{{name}}你好</h1>',
@@ -59,9 +60,6 @@ export default {
   methods: {
     clickDom () {
       this.once = '哈哈哈哈哈'
-    },
-    onCopy(){
-        document.execCommand('Copy'); // 执行浏览器复制命令
     },
     longPress () {
       alert('长按')
@@ -94,7 +92,7 @@ export default {
         el.$value = value
         el.handler = () => {
           if(!el.$value) {
-            console.log('无复制内容')
+            alert('无复制内容')
             return
           }
           // 创建textArea标签
@@ -113,7 +111,7 @@ export default {
           // 执行复制指令
           const result = document.execCommand('Copy')
           if(result) {
-            console.log('复制成功')
+            alert('复制成功')
           }
           document.body.removeChild(textarea)
         }

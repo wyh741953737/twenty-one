@@ -55,7 +55,7 @@ function findNum(arr) {
   for(let i = 0; i < arr.length; i++) {
     target = target ^ arr[i]
   }
-  console.log(target)
+  // console.log(target)
 }
 findNum(num)
 // 异或和某一位上1的个数有关，和顺序无关，偶数个为0，奇数个为1
@@ -100,6 +100,66 @@ function findMax(arr, l,r) {
   const rightmax = findMax(arr, mid+1, r)
   return Math.max(leftmax, rightmax)
 }
+
+
+// 找出区间最大值
+function process(arr, L, R) {
+  if(L === R) return
+  let mid = L+((R-L)>>1)
+  process(arr, L, mid)
+  process(arr, mid+1, R)
+  merge(arr, L, mid, R)
+  console.log(arr)
+}
+
+// 归并排序：左边排序，右边排序，让整体有序,利用了外排序（两个指针），时间复杂度O(NlogN)空间复杂度O(N)
+const mergeArr = [1,8,2,7,6,4,3,5]
+//  区间：[2,7,6,4,3],L=2, R=6, M=4 => [2,3,4,6,7], L=[2,7,6], R=[4,3] 结果：[2,4,3,7,6]
+function merge(arr, L, M, R) {
+  let result = new Array(R-L+1)
+  let i = 0
+  let p1 = L
+  let p2 = M+1
+  while(p1 <= M && p2 <= R) {
+    result[i++] = arr[p1] <= arr[p2] ? arr[p1++] : arr[p2++]
+  }
+  while(p1 <= M) {
+    result[i++] = arr[p1++]
+  }
+  while(p2 <= R) {
+    result[i++] = arr[p2++]
+  }
+  for(let i = 0; i < result.length; i++) {
+    arr[L+i] = result[i]
+  }
+  return arr
+}
+process(mergeArr, 2, 6)
+// process函数是T(N) 子规模：2*(N/2) merge的时间复杂度是O(N) 符合master公式
+// a=2,b=2,d=1 => logb^a=d  O(NlogN)
+// 归并排序最后能变成O(NlogN)，没有浪费比较行为，选择，冒泡排序都浪费在了比较行为。
+
+// 小和问题：在一个数组中，每个数左边比当前数小的累加起来叫做这个数组的小和，求一个数组的小和
+// [1,3,4,2,5]1比左边小的数没有，3左边比3小的有1,4左边比4小的有1,3。2比左边小的有1,5比左边小的有1,3,4,2所以小和为1+1+3+1+1+3+4+2=16
+// 逆思维，比当前数小的，从左到右，想成右边比左边大的有几个。
+function mergeAdd(arr, L, R) {
+  const mid = L+((R-L)>>1)
+  mergeAdd(arr, L, mid)
+  mergeAdd(arr, mid+1, R)
+  processAdd(arr, L, mid, R)
+}
+function processAdd(arr, L, M , R) {
+  const result = new Array(R-L+1)
+  let i = 0
+  let p1 = L
+  let p2 = M+1
+  while(p1 <= M && p2 <= R) {
+    if(arr[p1] <= arr[p2]) {
+     result.push(arr[p2++]) 
+    }
+  }
+}
+// 逆序对问题，在一个数组中，左边的数如果比右边的数大，则折两个数构成一个逆序对，请打印所有的逆序对
 
 // master公式
 // T(N) = a*T(N/b)+O(N^d) 

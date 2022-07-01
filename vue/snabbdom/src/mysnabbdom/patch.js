@@ -1,6 +1,9 @@
 import createElement from './createElement'
 import vnode from './vnode'
 
+// key是节点唯一标识，告诉diff算法，更改前后他们是同一个节点
+// 只有同一个虚拟节点才进行精细化比较（选择器和key都相同时）
+// 只进行同层比较，不会跨层比较，即使是同一片虚拟节点，但是跨层了也不会比较
 export default function(oldVnode, newVnode) {
   // 判断老节点是虚拟节点还是真实dom节点,
   if(oldVnode.sel === '' || oldVnode.sel === undefined) {
