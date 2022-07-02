@@ -109,7 +109,6 @@ function process(arr, L, R) {
   process(arr, L, mid)
   process(arr, mid+1, R)
   merge(arr, L, mid, R)
-  console.log(arr)
 }
 
 // 归并排序：左边排序，右边排序，让整体有序,利用了外排序（两个指针），时间复杂度O(NlogN)空间复杂度O(N)
@@ -134,31 +133,49 @@ function merge(arr, L, M, R) {
   }
   return arr
 }
-process(mergeArr, 2, 6)
+// process(mergeArr, 2, 6)
 // process函数是T(N) 子规模：2*(N/2) merge的时间复杂度是O(N) 符合master公式
 // a=2,b=2,d=1 => logb^a=d  O(NlogN)
 // 归并排序最后能变成O(NlogN)，没有浪费比较行为，选择，冒泡排序都浪费在了比较行为。
 
 // 小和问题：在一个数组中，每个数左边比当前数小的累加起来叫做这个数组的小和，求一个数组的小和
-// [1,3,4,2,5]1比左边小的数没有，3左边比3小的有1,4左边比4小的有1,3。2比左边小的有1,5比左边小的有1,3,4,2所以小和为1+1+3+1+1+3+4+2=16
-// 逆思维，比当前数小的，从左到右，想成右边比左边大的有几个。
-function mergeAdd(arr, L, R) {
+// [1,3,4,2,5] => [1,1,3,1,1,3,4,2]
+// [1,4,5,3,2] => [1,1,4,1,1]顺序不一样，最小和不一样
+// 逆思维，求左边比当前数小的可以理解为右边比当前数大的，从左到右，R-p2+1个比当前数大的
+
+// arr既要排好序也要求小和
+function mergeSum(arr, L, R) {
+  if(L===R) return 0
   const mid = L+((R-L)>>1)
-  mergeAdd(arr, L, mid)
-  mergeAdd(arr, mid+1, R)
-  processAdd(arr, L, mid, R)
+  // 左侧排好求小和的数量+右侧排好求小和数量+排好序后小和
+  const left = mergeSum(arr, L, mid) 
+  const right = mergeSum(arr, mid+1, R)
+  const total =  mergeAdd(arr, L, mid, R)
+  return left + right + total
 }
-function processAdd(arr, L, M , R) {
+function mergeAdd(arr, L, M , R) {
   const result = new Array(R-L+1)
   let i = 0
   let p1 = L
   let p2 = M+1
+  let res = 0
   while(p1 <= M && p2 <= R) {
-    if(arr[p1] <= arr[p2]) {
-     result.push(arr[p2++]) 
-    }
+    res += arr[p1] < arr[p2] ? (R-p2+1) * arr[p1] : 0
+    result[i++] = arr[p1] < arr[p2] ? arr[p1++] : arr[p2++]
   }
+  while(p1 <= M) {
+    result[i++] = arr[p1++]
+  }
+  while(p2 <= R) {
+    result[i++] = arr[p2++]
+  }  
+  for(let i = 0; i < result.length; i++) {
+    arr[L+i] = result[i]
+  }
+  console.log(res)
+  return res
 }
+mergeSum([1,3,4,2,5], 0, 4)
 // 逆序对问题，在一个数组中，左边的数如果比右边的数大，则折两个数构成一个逆序对，请打印所有的逆序对
 
 // master公式
