@@ -45,8 +45,6 @@ function swap(arr, i, j) {
   arr[i] = arr[i] ^ arr[j] // a ^ a ^ b = b ===> a = b
 }
 
-selectSort(arr)
-
 // 一个数组，其中一个数出现奇数次，其他都是偶数次，这个数是啥？用异或，循环每个数，如果异或为0，就是偶数次，异或不为0的取出来
 const num = [1, 3, 3, 4, 4, 5, 5]
 // 思想：同一批数，不管位置是啥的相异或偶数次相同的是0（可以视为出现次数是偶数的先异或得到0），最后异或的结果就是要取的值
@@ -143,7 +141,7 @@ function merge(arr, L, M, R) {
 // [1,4,5,3,2] => [1,1,4,1,1]顺序不一样，最小和不一样
 // 逆思维，求左边比当前数小的可以理解为右边比当前数大的，从左到右，R-p2+1个比当前数大的
 
-// arr既要排好序也要求小和
+// arr既要排好序也要求小和 
 function mergeSum(arr, L, R) {
   if(L===R) return 0
   const mid = L+((R-L)>>1)
@@ -175,12 +173,106 @@ function mergeAdd(arr, L, M , R) {
   console.log(res)
   return res
 }
-mergeSum([1,3,4,2,5], 0, 4)
+// mergeSum([1,3,4,2,5], 0, 4)
 // 逆序对问题，在一个数组中，左边的数如果比右边的数大，则折两个数构成一个逆序对，请打印所有的逆序对
+// 比如：32450 ==》 [3,2],[3,0],[2,0],[4,0], [5,0]
 
+
+// 快排
+function quickSort(arr, l, r) {
+  if(l < r) {
+    swap(arr, l+Math.random()*(r-l+1), r)
+    let p = partition(arr, l, r)
+    quickSort(arr, l, p[0]-1) // <区域
+    quickSort(arr, p[1]+1, r) // >区域
+  }
+}
+function partition(arr, l, r) {
+  let less = l -1 // <右边界
+  let more = r // >左边界
+  while(l < more) {
+    if(arr[l] < arr[r]) {
+      swap(arr, ++less, l++)
+    } else if(arr[l] > arr[r]) {
+      swap(arr, --more, l)
+    }
+  }
+  swap(arr, more, r)
+  return [less+1, more]
+}
 // master公式
 // T(N) = a*T(N/b)+O(N^d) 
 // T(N)是母函数，a是次，T(N/b)是子过程，O(N^b)是除了子过程之外的代码
 // 比如上面的函数，findMax是母函数，T(N), 递归调用自己的次数是2次，每次N/2次（子过程规模是N/2)，其他的代码执行是O(1) 所以T(N)=2*T(N/2)+O(1)
 // 当b=2，d=0，a=2的时候，findMax函数满足master公式
 // 满足以上条件的递归，时间复杂度
+
+// 给定一个数组arr，和一个数num，请把小于等于num的数放左边，大于num的数放数组右边，要求空间复杂度O(1),时间复杂度O(N)
+// i<=num，i和<=下一个数交换，<=右扩.[i]>num跳过，i++
+
+// 给定一个数组arr，和一个数num，请把小于num的数放左边，等于num的放中间，大于num的数放数组右边，要求空间复杂度O(1),时间复杂度O(N)
+
+// 堆结构：用数组实现的完全二叉树结构
+// 完全二叉树：如果每棵子树的最大值都在顶部就是大根堆，如果每颗子树的最小值都在顶部就是小根堆。
+// 完全二叉树：父：(i-1)/2, 左：2*i+1,右:2*i+2
+function heapify(arr, index, heapSize) { // 时间复杂度：n*logn
+  let left = index * 2 + 1 // 左下标
+  while(left < heapSize) { // 左下标还有孩子
+    let largest = left + 1 < heapSize && arr[left+1] > arr[left] ? left+1 : left // 两个孩子谁大，下标给谁
+    largest = arr[largest] > arr[index] ? largest : index // 父和子谁大给谁
+    if(largest === index) {
+      break;
+    }
+    swap(arr, largest, index)
+    index = largest
+    left = index * 2 + 1
+  }
+}
+// 堆排序:时间复杂度n*logn
+function heapSort (arr) {
+  // for(let i = 0; i < arr.length; i++) {
+  //   heapInsert(arr, [i])
+  // }
+  // 也可以直接跳过
+  let heapSize = arr.length
+  swap(arr, 0, --heapSize)
+  while(heapSize > 0) {
+    heapify(arr, 0, heapSize)
+    swap(arr, 0, --heapSize)
+  }
+}
+function heapInsert(arr, index) { // 时间复杂度：n*logn
+  while(arr[index] > arr[(index-1)/2]) {
+    swap(arr, index, (index-1)/2)
+    index = (index-1)/2
+  }
+}
+
+// 已知一个几乎有序的数组，几乎有序是指：如果吧数组排好顺序，每个元素移动的距离不可超过k
+// 并且k相对于数组来说比较小，请选择一个合适的排序算法针对这个数据进行排序
+function sortedArrDistanceLess(arr, k) {
+  let index = 0
+  let result = []
+  for(; index <= Math.min(arr.length, k); index++) {
+    result.push(arr[index])
+  }
+  let i = 0
+  for(; index < arr.length;i++,index++) {
+    result.push(arr[index])
+    arr[i] = result.pop()
+  }
+  while(!result.isEmpty()) {
+    arr[i++] = result.pop()
+  }
+}
+
+// 堆排序
+function radixSort(arr, L, R, digit) {
+  let radix = 10
+  let i = 0;
+  let j = 0
+  let bucket = new Array(R-L+1)
+  for(let d=1; d<=digit;d++) {
+    
+  }
+}
