@@ -113,9 +113,9 @@
         if(inserted) {
           ob.observeArray(inserted)
         }
-        original.apply(this, arguments)
+        const result = original.apply(this, arguments)
         console.log('啦啦啦')
-        return original
+        return result
       }, false)
     })
     observe(obj)
