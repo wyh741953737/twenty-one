@@ -3,9 +3,7 @@ let arr = [9, 2, 7, 1, 5, 3, 8, 4, 6]
 // 选择排序，选择第i个，遍历n轮，每次2个数进行交换
 // 时间复杂度：O(n^2), 空间复杂度O(1)
 function selectSort(arr) {
-   if(arr.length < 2) {
-    return arr
-   }
+   if(arr.length < 2) return arr
    for(let i=0; i<arr.length; i++) {
      for(let j=i+1; j < arr.length; j++) {
       if(arr[i] > arr[j]) {
@@ -15,22 +13,33 @@ function selectSort(arr) {
    }
    return arr
 }
-
-// 冒泡排序 相邻两个比较，比较n-1轮，
+function selectSort2(arr) {
+  for(let end = arr.length; end >0; end--) {
+    let max = 0
+    for(let begin = 1; begin <= end; begin++) {
+      if(begin > end) {
+        max = begin
+      }
+    }
+    swap(max, end)
+  }
+}
+// 冒泡排序 相邻两个比较，比较n-1轮，时间复杂度：O(n^2) 空间复杂度O(1)，稳定排序 
 function bubbleSort(arr) {
-  if(arr.length < 2) {
-    return arr 
-   }
+   if(arr.length < 2) return arr
    for(let e = arr.length - 1; e > 0; e--) {
+    let endIndex = 0
     for(let i = 0; i < e; i++) {
       if(arr[i] > arr[i+1]) {
         swap(arr, i, j)
+        endIndex = i
       }
     }
+
    }
 }
 
-// 插入排序
+// 插入排序,时间复杂度O(n^2),空间复杂度O(1)
 function insertSort (arr) {
   if(arr.length < 2) return arr
   for(let i = 1; i < arr.length; i++) { // 0-i做到有序
@@ -179,6 +188,9 @@ function mergeAdd(arr, L, M , R) {
 
 
 // 快排
+// 1.0版本：拿最后一个数划分，小于等于的放在左边，右边·是大于的区域，
+// 2.0版本，拿最后一个值划分，小于的放在左边，等于这个数的放中间，大于这个数的放右边，再把小于和大于的递归
+// 3.0版本，随机选一个数，小于这个数放左边，等于这个数放中间，大于这个数放右边，再把小于区域和大于区域递归
 function quickSort(arr, l, r) {
   if(l < r) {
     swap(arr, l+Math.random()*(r-l+1), r)
@@ -276,3 +288,116 @@ function radixSort(arr, L, R, digit) {
     
   }
 }
+
+// 查找缺失的数字：nums包含0到n的整数，缺失了一个请找出，比如[0,2,3] // 1
+// 思路：0+1+2+..n - (a[0]+a[1]+a..[n]) 相减得到的结果就是缺失的
+// 使用下标，数组中值是几，就在第几位置写值，缺失位置的就是值
+// 给一个值x=0，x跟[0,n]所有值异或，x和数组中每个值异或，最后x就是缺失的数字。
+
+// 旋转数组：给定一个数组，将数组中的元素向右移动k个位置，其中k是非负数 nums=[1,2,3,4,5,6,7] k=3 输出[5,6,7,1,2,3,4]
+// 前n-k个数反转，后k个数反转，最后整体反转
+// 当k等于n时相当于不旋转
+function revert (arr, left, right) {
+  while(left < right) {
+    let temp = arr[left]
+    arr[left] = arr[right]
+    arr[right] = temp
+    ++left
+    --right
+  }
+}
+function rotate(nums, numSize, k) {
+  if(k >= numSize) {
+    k %= numSize
+  }
+  revert(nums, 0, numSize-1)
+  revert(nums, numSize-k, numSize-1)
+  revert(nums, 0, numSize-1)
+}
+
+// 线性表：具有相同特性元素的有限序列：顺序表、链表、栈、队列
+
+// 寻找字符串中，连续重复最多的字符
+// 'aaaaabbbbbbbbbbbcddd'
+function findMaxStr(str) {
+  let i = 0
+  let j = 1
+  let max = 0
+  let maxStr = ''
+  while(i < str.length-1) {
+    if(str[i] !== str[j]) {
+      if(j-i > max) {
+        max = j-i
+        maxStr = str[i]
+      }
+      i = j
+    }
+    j++
+  }
+}
+// 斐波那契数列：递归重复，如何解决？
+function fb1(n) {
+  let cache = {}
+  if(cache.hasOwnProperty(n)) {
+    return cache[n]
+  }
+  let v = n===0 || n===1 ? 1 : fb1(n-1) + fb1(n-2)
+  cache[n] = v
+  return v
+}
+// 试将数组[1,2, [3,[4,5],6], 7, [8], 9] 变成 {children: [{value:1}, {value: 2}, {children: [{value: 3}, {children: [{value: 4}, {value: 5}]}, {value: 7}]}]}
+function convert(arr) {
+  let result = []
+  for(let i = 0; i < arr.length; i++) {
+    if(typeof arr[i] === 'number') {
+      result.push({value: arr[i]})
+    } else if(Array.isArray(arr[i])) {
+      result.push({
+        children: convert(arr[i])
+      })
+    }
+  }
+}
+// 映射实现上面的
+function mapConvert(item) {
+  // item可能是数组或者数字
+  if(typeof item === 'number') {
+    return {value: item}
+  } else if(Array.isArray(item)) {
+    return { children: item.map(_item => mapConvert(_item))} // 遇到什么都递归，上面的函数只有是数组才递归
+  }
+}
+// 让3[abc]变成abcabcabc将3[2[a]a[b]]变成aabbaabbaabb
+// 利用栈模拟：两个栈，遍历每个字符，如果这个字符是数字，将数字压栈a，将空字符串压栈b
+// 如果字符是字母，将栈顶的这项改成字母。如果字符串是]那么将数字弹栈，将字符串栈的栈顶元素重复数字的次数，拼接到新的栈顶
+function repeat(str, num) {
+  let result = ''
+  for(let i = 0; i < num; i++) {
+    result += str
+  }
+  return result
+}
+function smartRepeat(str) {
+  let stackNum = []
+  let stackStr = []
+  for(let i = 0; i < str.length; i++) {
+    if(/\d/g.test(str[i])) {
+      stackNum.push(str[i])
+    } else if(str[i] === '[') {
+      stackStr.push('')
+    } else if(str[i] === ']') {
+      const num = stackNum[stackNum.length-1]
+      const str = stackStr[stackStr.length-1]
+      const repeatStr = repeat(str, num)
+      // 拼接到前面一个
+      const preStr = stackStr[stackStr.length-2] || ''
+      stackStr.pop()
+      stackStr.splice(stackStr.length-1, 1, preStr + repeatStr)
+      stackNum.pop()
+    } else { // 字符是字母 ['', 'a']
+      stackStr.splice(stackStr.length-1, 1, str[i])
+    }
+  }
+  console.log(stackStr)
+}
+smartRepeat("2[3[b]2[c]]1[m]")
