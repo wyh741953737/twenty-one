@@ -370,34 +370,30 @@ function mapConvert(item) {
 // 让3[abc]变成abcabcabc将3[2[a]a[b]]变成aabbaabbaabb
 // 利用栈模拟：两个栈，遍历每个字符，如果这个字符是数字，将数字压栈a，将空字符串压栈b
 // 如果字符是字母，将栈顶的这项改成字母。如果字符串是]那么将数字弹栈，将字符串栈的栈顶元素重复数字的次数，拼接到新的栈顶
-function repeat(str, num) {
-  let result = ''
-  for(let i = 0; i < num; i++) {
-    result += str
-  }
-  return result
-}
+// 关键还要用一个临时变量保存后面字符串，方便最后判断第0项是不是]
 function smartRepeat(str) {
   let stackNum = []
   let stackStr = []
-  for(let i = 0; i < str.length; i++) {
-    if(/\d/g.test(str[i])) {
-      stackNum.push(str[i])
-    } else if(str[i] === '[') {
+  let index = 0
+  let rest = str
+  while(index < str.length-1) {
+    rest = str.substring(index)
+    if(/^\d+\[/.test(rest)) { // 以数字和[开头
+      const num = rest.match(/^(\d+)\[/)[1]
+      stackNum.push(num)
       stackStr.push('')
-    } else if(str[i] === ']') {
-      const num = stackNum[stackNum.length-1]
-      const str = stackStr[stackStr.length-1]
-      const repeatStr = repeat(str, num)
-      // 拼接到前面一个
-      const preStr = stackStr[stackStr.length-2] || ''
-      stackStr.pop()
-      stackStr.splice(stackStr.length-1, 1, preStr + repeatStr)
-      stackNum.pop()
-    } else { // 字符是字母 ['', 'a']
-      stackStr.splice(stackStr.length-1, 1, str[i])
-    }
+      index += num.toString().length + 1 // 数字+[的长度
+    } else if(/^\w+\]/.test(rest)) { // 中间字母+]
+      const word = rest.match(/^(\w+)\]/)[1]
+      stackStr[stackStr.length-1] = word
+      index += word.length
+    } else if(rest[0] == ']') {
+      const num = stackNum.pop()
+      const word = stackStr.pop()
+      stackStr[stackStr.length-1] += word.repeat(num)
+      index++
+    } 
   }
-  console.log(stackStr)
+  return stackStr[0].repeat(stackNum[0]) // 上面while循环后，小于str的长度减1，所以两个栈肯定会剩下最后一项
 }
-// smartRepeat("2[3[b]2[c]]1[m]")
+// const result = smartRepeat('1[2[3[1[a]2[b]]]3[Q]]')
