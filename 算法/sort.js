@@ -397,3 +397,73 @@ function smartRepeat(str) {
   return stackStr[0].repeat(stackNum[0]) // 上面while循环后，小于str的长度减1，所以两个栈肯定会剩下最后一项
 }
 // const result = smartRepeat('1[2[3[1[a]2[b]]]3[Q]]')
+
+
+function parseAttr (attrsStr) {
+  let result = []
+  if(attrsStr === undefined) return []
+  let isYinhao = false
+  let point = 0
+  for(let i = 0; i < attrsStr.length; i++) {
+    let char = attrsStr[i]
+    if(char === '"') {
+      isYinhao = !isYinhao
+    } else if(char === ' ' && !isYinhao) { // 遇见空格并且不在引号中
+      if(!/^\s*$/.test(attrsStr.substring(point, i))) {// id="id hh" style="color: red"
+        result.push(attrsStr.substring(point, i).trim())
+        point = i
+      }
+    } 
+  }
+  // 循环结束后还剩下一个k=v
+  result.push(attrsStr.substring(point).trim())
+  result = result.map(item => {
+    const o = item.match(/^(.+)="(.+)"$/)
+    return {name: o[1], value: o[2]}
+  })
+  return result
+}
+function strToAst (templateString) {
+  let index = 0
+  let rest = ''
+  const startTagReg = /^\<([a-z]+[1-6]?)(\s[^\<]+)?\>/
+  const endTagReg = /^\<\/([a-z]+[1-6]?)\>/
+  const stack1 = []
+  const stack2 = [{children: []}]
+  const wordReg = /^([^\<]+)\<\/[a-z]+[1-6]?\>/ // 结束标签前的文字
+  while(index < templateString.length -1) {
+    rest = templateString.substring(index)
+    if(startTagReg.test(rest)) {
+      const tag = rest.match(startTagReg)[1]
+      const attrString = rest.match(startTagReg)[2]
+      stack1.push(tag)
+      stack2.push({'tag': tag, 'children': [], 'attrs': parseAttr(attrString)})
+      const attrStringLength = attrString !== null ? attrString.length : 0
+      index += tag.length + 2 + attrStringLength
+    } else if(endTagReg.test(rest)){
+      const tag = rest.match(endTagReg)[1]
+      let pop_tag = stack1.pop()
+      if(tag !== pop_tag) { // 此时tag一定是和栈1顶部相同的
+        throw new Error('标签位闭合')
+      } else {
+        const pop_arr = stack2.pop()
+        if(stack2.length > 0) {
+          stack2[stack2.length - 1].children.push(pop_arr)
+        }
+      }
+      index += tag.length + 3
+    } else if(wordReg.test(rest)) {
+      const word = rest.match(wordReg)[1]
+      if(!/^\s+$/.test(word)) { // 检测收尾是的是空格
+        stack2[stack2.length-1].children.push({'text': word, 'type': 3}) 
+      }
+      index += word.length
+    } else {
+      index++
+    }
+    // 自封闭标签检测
+  }
+  return stack2[0].children[0]
+}
+const templateString = `<div class="tag hello" style="color: red"><h3>你好</h3><ul><li>A</li><li>B</li><li>C</li></ul></div>`
+const resultAst = strToAst(templateString)
