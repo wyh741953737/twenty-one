@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>测试</div>
+  <script>
+    const appContent = `<div>
+      <div>哈哈哈</div>
+      <style>div{color: red}</style>
+    </div>`
+    const containerElement = document.createElement('div')
+    containerElement.innerHTML = appContent
+    const appElement = containerElement.firstChild
+    let html = appElement.innerHTML
+    appElement.innerHTML = '' // 关键
+    let shadow = appElement.attachShadow({mode: 'open'}) // 太封闭，
+    shadow.innerHTML = html
+    document.body.appendChild(appElement)
+  </script>
+</body>
+</html>
