@@ -12,6 +12,9 @@ snabbdom
   2: h函数判断类型：字符串调用vnode，数组的话遍历每个收集children，对象就收集到children，调用vnode
 最后通过patch函数上树patch(container, vdom)
   1：判断老节点是真实dom还是虚拟节点，是真实的调用vNode生成虚拟节点
-  2：对比新旧节点，判断节点是不是同一个节点(key和sel相同),是同一个节点，判断属性和子节点是否相同，不是同一个节点之间暴力插入(createElement生成真实dom）删除
+  2：对比新旧节点，判断节点是不是同一个节点(key和sel相同),是同一个节点:判断是否是同一个对象，判断新节点有没text属性，没有意味着有子节点
+  不是同一个节点之间暴力插入(createElement生成真实dom）删除
+createElement
+  根据vnode的sel创建真实节点，判断vnode是文本还是有孩子，文本给innerText赋值，有孩子，递归调用createElement，最后返回vnode.elm
 dom的diff
 虚拟dom如何通过diff变成真正dom

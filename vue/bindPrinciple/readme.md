@@ -8,7 +8,6 @@ el和mount： el: 在new里面写el:'#app'  v.$mount('#app')
 data的函数写法和对象：Vue管理的函数不要使用箭头函数
 Object.defineProperty定义的属性默认不可枚举，Object.keys()不能列举
 Object.defineProperty可以实现一个简单的数据代理
-事件： 事件绑定时@click="btnClick" 默认第一个参数是event，但是，你传参后，evnet丢失，你可以用$event占位
 methods中配置的函数，this指向vm或者组件实例对象
 事件修饰符： once,prevent, stop, capture,passive，self：只有event.target是当前操作的元素时才触发, passive：事件默认行为立刻执行，无需等到事件回调执行完毕
 事件修饰符可以连用：@click.stop.prevent=""
@@ -94,3 +93,18 @@ Vuex：集中式管理，任意组件通信方式。多个组件依赖同一状�
 
 
 
+Vue数组实现响应式原理：
+改写了数组的7个方法：push，pop，shift，unshift，splice，sort，reverse
+通过Object.setPrototypeof(value, arrayMethods)
+
+什么是依赖？
+vue1.x细粒度依赖，用到数据的dom都是依赖
+vue2.x中等粒度依赖，用到数据的组件是依赖
+在getter中收集依赖，在setter中触发依赖
+
+dep类和watcher类
+依赖就是watcher，只有watcher触发的getter才会收集依赖，哪个watcher触发了getter就把哪个watcher收集到dep中
+dep使用了发布订阅模式，数据变化会循环依赖列表，将所有的watcher都通知一遍
+watcher将自己设置到全局的一个指定位置，然后读取数据，因为读取了数据就会触发这个数据的getter，在getter中就能得到当前正在读取数据的watcher，并吧watcher手机到dep中
+每个Observer的实例，成员中都有一个Dep的实例
+，watcher是一个中介，数据发生变化时通过watcher中转，通知组件

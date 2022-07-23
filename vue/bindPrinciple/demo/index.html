@@ -104,24 +104,35 @@
         switch(methodName) {
           case 'push':
           case 'unshift':
-            inserted = arguments
+            inserted = args
             break
           case 'splice':
-            inserted = arguments.slice(2)
+            inserted = args.slice(2)
             break
         }
         if(inserted) {
           ob.observeArray(inserted)
         }
-        const result = original.apply(this, arguments)
+        const result = original.apply(this, args)
         console.log('啦啦啦')
         return result
       }, false)
-    })
+    }) 
     observe(obj)
     obj.a.f = 0
     obj.j.push(4)
     console.log(obj.j)
+    
+    function parsePath(str) {
+      let args = str.split('.')
+      return (obj) => {
+        for(let i = 0; i < args.length; i++) {
+          if(!obj) return
+          obj = obj[args[i]]
+        }
+        return obj
+      }
+    }
   </script>
 </body>
 

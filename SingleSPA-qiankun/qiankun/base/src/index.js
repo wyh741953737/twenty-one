@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import './App.css';
 
 import {
   registerMicroApps,
@@ -22,15 +21,22 @@ const render = (porps) => {
 render({ loading: true });
 
 const appStart = () => {
-  // 设置子应用首次加载loading效果
-  const loader = (loading) => render({ loading });
   const routes = [
+    {
+      name: "m-react",
+      entry: "//localhost:1000",
+      activeRule: "/react",
+      container: "#container",
+      props: {
+        info: "来了",
+        routerBase: "/react", // 给子应用下发的基础路由
+      },
+    },
     {
       name: "m-vue",
       entry: "//localhost:2000",
       activeRule: "/vue",
       container: "#container",
-      loader,
       props: {
         info: "来了",
         routerBase: "/vue", // 给子应用下发的基础路由

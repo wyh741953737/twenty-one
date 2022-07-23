@@ -19,9 +19,9 @@ export default function(templateString) {
       if(tag !== pop_tag) { // 此时tag一定是和栈1顶部相同的
         throw new Error('标签位闭合')
       } else {
-        const pop_arr = stack2.pop()
+        const pop_str = stack2.pop()
         if(stack2.length > 0) {
-          stack2[stack2.length - 1].children.push(pop_arr)
+          stack2[stack2.length - 1].children.push(pop_str)
         }
       }
       index += tag.length + 3

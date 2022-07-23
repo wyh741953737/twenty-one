@@ -1,11 +1,9 @@
-import logo from './logo192.png';
+import React from 'react'
 
-function App() {
-  return (
-    <div>
-      <img src={logo} alt="logo" />
-    </div>
-  );
+const App = ({ children }) => {
+  return <div className="App">
+    {children}
+  </div>;
 }
 
 export default App;
