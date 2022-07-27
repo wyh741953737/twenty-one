@@ -13,7 +13,8 @@ module.exports = {
   },
   optimization: {
     moduleIds: 'deterministic', // 模块名称生成规则
-    chunkIds: 'deterministic' // 代码块生成规则
+    chunkIds: 'deterministic', // 代码块生成规则
+    usedExports: true, // 标志使用到的导出
   },
   resolve: {
     // fallback: { // polyfill
