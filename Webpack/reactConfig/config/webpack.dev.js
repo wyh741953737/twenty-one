@@ -1,5 +1,6 @@
 const EslintWebpackPlugin = require('eslint-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const path = require('path')
 
 const getStyleLoaders = (pre) => {
@@ -55,13 +56,13 @@ module.exports = {
         type: 'asset/resource'
       },
       {
-        test: /\.js[x]?$/,
-        include: path.resolve(__dirname, '../src'),
+        test: /\.jsx?$/,
+        include: [path.resolve(__dirname, '../src')],
         loader: 'babel-loader',
         options: {
-          cacheDirectory: true,
-          cacheCompression: true,
-          presets: ['@babel/preset-react', '@babel/preset-env']
+          cacheDirectory: true, // 开启缓存
+          cacheCompression: false, // 关闭缓存文件压缩
+          plugins: ['react-refresh/babel'] // 激活js的HMR
         }
       }
     ]
@@ -72,10 +73,10 @@ module.exports = {
     }),
     new EslintWebpackPlugin({
       context: path.resolve(__dirname, '../src'),
-      exclude: 'node_modules',
       cache: true,
       cacheLocation: path.resolve(__dirname, '../node_modules/.cache/.eslintcache')
-    })
+    }),
+    new ReactRefreshWebpackPlugin()
   ],
   devtool: 'cheap-module-source-map',
   mode: 'development',
@@ -87,13 +88,14 @@ module.exports = {
       name: entrypoint => `runtime~${entrypoint.name}.js`
     }
   },
+  resolve: {
+    extensions: [".jsx", ".js", ".json"] // 自动补全文件扩展名
+  },
   devServer: {
     host: 'localhost',
     port: 3000,
     open: true,
-    hot: true
+    hot: true,
+    historyApiFallback: true // 解决路由刷新404，ture会重定向到index.html
   },
-  resolve: {
-    extensions: [".jsx", ".js", ".json"]
-  }
 }

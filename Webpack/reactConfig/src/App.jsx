@@ -1,9 +1,10 @@
 import React from 'react'
-import Home from '../pages/Home/index.jsx'
+import { Button } from 'antd'
+
 function App () {
   return <div>
     <h1>你好啊</h1>
-    <Home />
+    <Button>你好点击</Button>
   </div>
 }
 
