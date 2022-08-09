@@ -24,7 +24,11 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, './public/index.html')
     }),
-    new BannerPlugin()
+    new BannerPlugin({
+      options: {
+        author: '哈哈'
+      }
+    })
   ],
   mode: 'development',
   devServer: {
