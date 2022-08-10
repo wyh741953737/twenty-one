@@ -87,11 +87,11 @@ module.exports = {
       filename: 'static/css/[name].[contenthash: 10].css',
       chunkFilename: 'static/css/[name].[contenthash:10].chunk.css'
     }),
-    // new CopyWebpackPlugin({
-    //   patterns: [
-    //     { from: path.resolve(__dirname, '../public'), to: path.resolve(__dirname, '../dist'), globOptions: { ignore: ["**/index.html"]} } // 要把public下的inde.html忽略
-    //   ]
-    // })
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: path.resolve(__dirname, '../public'), to: path.resolve(__dirname, '../dist'), globOptions: { ignore: ["**/index.html"]} } // 要把public下的inde.html忽略
+      ]
+    })
   ],
    optimization: {
     splitChunks: {
