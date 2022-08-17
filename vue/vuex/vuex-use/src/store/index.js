@@ -12,6 +12,7 @@ const store = new Vuex.Store({
       },
       mutations: {
         changeAge(state, value) {
+          console.log('模块A的数据')
           state.age = value
         }
       },
@@ -23,7 +24,20 @@ const store = new Vuex.Store({
           },
           mutations: {
             changeAge(state, value) {
-              console.log('')
+              console.log('模块B的数据')
+              state.age = value
+            }
+          },
+        },
+        C: {
+          namespaced: true,
+          state: {
+            name: '模块C的数据',
+            age: 20
+          },
+          mutations: {
+            changeAge(state, value) {
+              console.log('模块C的数据')
               state.age = value
             }
           },

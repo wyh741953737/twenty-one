@@ -5,6 +5,7 @@
     <h3>{{userName}}</h3>
     <h4>{{fullName}}</h4>
     <button @click="changeStoreState">commit一个mutation</button>
+    <button @click="changeAge">同步mutations</button>
   </div>
 </template>
 
@@ -13,6 +14,7 @@ import { mapState } from 'vuex';
 export default {
   name: 'App',
   mounted() {
+    console.log('====', this.$store)
   },
   // computed: mapState({
     //   userName: state => state.userName,
@@ -31,6 +33,9 @@ export default {
   methods: {
     changeStoreState () {
       this.$store.commit('changeName', '你好啊')
+    },
+    changeAge () {
+      this.$store.commit('changeAge', 12)
     }
   },
 }
