@@ -38,7 +38,7 @@
         }
       },
       mounted() {
-        // this.type.name = '我在mounted改了数据'
+        this.type.name = '我在mounted改了数据'
         // alert(this.type.name)
       },
     })
@@ -50,6 +50,15 @@
   </script>
   <script>
 
+    function getList () {
+      setTimeout(() => {
+        return '哈哈'
+      }, 20000);
+    }
+    async function getData () {
+      const res = await getList()
+      
+    }
   </script>
 </body>
 

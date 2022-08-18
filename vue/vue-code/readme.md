@@ -2,14 +2,10 @@
 
 
 ### vue内部执行过程
-
-1：调用Vue构造函数，传入的options保存起来
-2：Vue函数内，对数据进行响应式处理observe函数，对数据进行代理proxy函数，之后执行编译函数Compile
-3：oberve函数会实例化一个Observer对象
-4：Observer就是遍历做响应式处理
-5：defineReactive内部，会创建Dep实例，在你访问的时候进行依赖收集，触发值修改的时候会触发通知
-6：Compile函数内部会遍历子节点，触发对应的操作，同时会有一个update方法，外部调用这个方法进行初始化和更新
-7：Watcher监听器，负责依赖的更新，
+Observer就是遍历做响应式处理
+defineReactive内部，会创建Dep实例，在你访问的时候进行依赖收集，触发值修改的时候会触发通知
+Compile函数内部会遍历子节点，触发对应的操作，同时会有一个update方法，外部调用这个方法进行初始化和更新
+Watcher监听器，负责依赖的更新
 
 创建实例：会有几个Observer， Dep， Watcher
 
@@ -54,6 +50,9 @@ defineReactive中也声明了dep，这里的dep和key一一对应
 
 ###
 Observer中，每个key对应一个Dep，每个Dep有多个Watcher，当key发生改变，找到对应的Dep，执行里面的Watchers的更新函数
+defineReactive中也声明了dep,每个对象会执行defineReactive$$1,里面会实例化dep
+
+
 
 ### Dep，Watcher， Observe怎么建立关联
 1：在DefineReactive中，每个key都和Dep会建立一对一的关联，
@@ -132,3 +131,72 @@ data=mergedInstanceDataFn() {}
         }
       })
     }
+
+
+### 
+vue2生命周期：
+进行一些初始化，比如initProxy，initLifecycle(主要是给vm加一些生命周期相关的属性)，initEvents，initReners（vm上挂载_c也就是createElement函数）
+
+- callHook(vm, 'beforeCreate')
+
+initInjections(vm)初始化注入，initState（如果有props初始化props，如果有methods，initMethods（判读是否是函数，是否和prop同名，是否是vue身上的实例）
+如果有data，initData（给vm通过proxy添加_data，将data中的变量通过Object.defineProperty定义到vm._data身上））然后执行observe(一个对象就会实例化一个Observer实例)开始响应式处理
+  ob = new Observer()
+  ob.value = value
+  ob.dep = new Dep() // Dep () {this.id=uid++; this.subs = []} Dep上有addSub，removeSub，depend,notify通知更新
+  def(value, '__ob__', this)
+  判读数组还是对象开始响应式处理
+  对象：遍历，defineReactive$$1(obj, keys[i])
+    defineReactive$$1：dep = new Dep(), 
+      Object.defineProperty(obj, key, {
+        get: reactiveGetter() => { 先得到value，判断Dep.target是否有值，有值dep.depend()//依赖收集，如果有儿子，childObj.dep.depend(),如果值是数组，dependArray}})
+        set: reactiveSetter() => { 先得到value，递归儿子响应式处理，dep.notify()}
+如果有watch，initWatch（vm.$watch）
+vue.prototype.$watch = (expOrFn, cb, options) => {
+ const watcher = new Watcher(vm, expOrFn, cb, options)
+} 
+const Watcher = (vm, expOrFn, cb, options) => {
+  vm._watchers.push(this)
+}
+watcher.prototype.get = function() {
+  pushtarget(this)
+}
+
+initProvide(vm)
+
+- callHook(vm, 'created')
+vm.$mount(vm.$options.el)
+Vue.prototype.$mount = function(el, hydrating) {
+  el = el && query(el)
+  template = getOuterHtml(el)
+  mountComponent(vm, el, hydrating)
+}
+mountComponent(vm, el, hydrating) {
+  callHook(vm, 'beforeMount')
+  updateComponent = function() { vm._update(vm._render(), hydrating)}
+  new Watcher(vm, updateComponent, noop, {before: function before () {
+    if(vm.isMounted && !vm._isDestoryed) {
+ -  callHook(vm, 'beforeUpdate')
+    }
+  }})
+  if(vm.$vnode === null) {
+    vm._isMounted = true
+-    callHook(vm, 'mounted')
+  }
+  return vm
+}
+beforeCreate，无$el, 无$data
+created  无$el, 有$data
+beforeMount 无$el, 有$data
+mounted 有$el, 有$data
+beforeUpdate
+updated
+beforeDestory
+destoryed
+$el在mounted以后才能被访问，$data在created阶段能被访问到
+如果加了keep-alive会多2个：actived，deactived
+如果加了keep-alice，第二次或者第N次进入组件只会执行actived一个生命周期
+
+
+keep-alive：vue自带的组件，缓存组件提升性能
+使用场景：缓存组件

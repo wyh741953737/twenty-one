@@ -67,3 +67,22 @@ class Compile {
     node.textContext = this.$vm[exp]
   }
 }
+
+
+
+
+
+
+
+
+(function(window, factory) {
+   if(typeof exports === 'object') {
+    module.exports = factory()
+   } else if(typeof define === 'function' && define.amd) {
+    define(factory)
+   } else {
+    window.eventUtil = factory()
+   }
+})(window, function() {
+  // ...
+})
