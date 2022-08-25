@@ -1,0 +1,3 @@
+### blob和msSaveBlob
+window.navigator.msSaveBlob和window.navigator.msSaveOrOpenBlob方法以本地方式保存文件
+IE10的msSaveBlob（提供保存按钮）和msSaveOrOpenBlob（提供保存和打开按钮）允许用户在客户端保存文件，方法就像同internet下载文件，可以保存到下载文件夹
