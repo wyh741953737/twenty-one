@@ -48,6 +48,7 @@ const store = new Vuex.Store({
   state: {
     userName: 'XXX',
     age: 12,
+    age2: 1,
     hobby: '写代码',
     arrs: [12, 1, 2, 4]
   },
@@ -61,6 +62,7 @@ const store = new Vuex.Store({
       state.userName = value
     },
     changeAge(state, value) {
+      console.log('主模块的数据')
       state.age = value
     }
   },
