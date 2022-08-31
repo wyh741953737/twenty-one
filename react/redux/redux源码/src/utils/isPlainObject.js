@@ -6,7 +6,6 @@ export default function isPlainObject(obj) {
   while (Object.getPrototypeOf(proto) !== null) {
     proto = Object.getPrototypeOf(proto)
   }
-
   return Object.getPrototypeOf(obj) === proto
 }
 

@@ -1,13 +1,4 @@
-/**
- * Composes single-argument functions from right to left. The rightmost
- * function can take multiple arguments as it provides the signature for
- * the resulting composite function.
- *
- * @param {...Function} funcs The functions to compose.
- * @returns {Function} A function obtained by composing the argument functions
- * from right to left. For example, compose(f, g, h) is identical to doing
- * (...args) => f(g(h(...args))).
- */
+
 
 export default function compose(...funcs) {
   if (funcs.length === 0) {
@@ -17,6 +8,9 @@ export default function compose(...funcs) {
   if (funcs.length === 1) {
     return funcs[0]
   }
-
   return funcs.reduce((a, b) => (...args) => a(b(...args)))
 }
+
+// ** 执行顺序是从右到左 
+// 是函数式编程的一种形式，用于将多个函数合并，上一个函数的返回值作为当前函数的入参，当前函数的返回值作为下一个函数的入参，类似KOA洋葱模型
+// [a,b,c,d] => a(b(c(d())))
