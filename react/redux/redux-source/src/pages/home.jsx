@@ -1,31 +1,37 @@
-
-import store from '../store/index'
-import { sendAction } from '../store/actions'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { connect } from 'react-redux'
 
 function Home() {
   const [state, setState] = useState('状态')
   const handlerClick = () => {
-    const action = sendAction()
-    store.dispatch(action)
-  }
-  useCallback(() => {
-    console.log('===useCallback')
-    store.subscribe(() => {
-      console.log('subscribe', store.getState())
-    })
-  }, [store])
-  useCallback(() => {
+    console.log(this)
     
+  }
+  useEffect(() => {
+  }, [])
+  useCallback(() => {
+
   }, [])
   return (
     <div>
       <h1>我是react首页</h1>
-      <button onClick={handlerClick}>发送请求</button>
-      <h2>{store.getState().value}</h2>
+      <button onClick={handlerClick}>加</button>
       <h3>{state}</h3>
     </div>
   );
 }
 
-export default Home;
+// mapstatetoprops将store数据做为peops绑定到组件，state是redux的stroe，ownProps自己的props
+// mapdispatchtoProps将action作为props绑定到组件，dispatch就是store.dispatch
+// mergeProps,通常不用，redux会用Object.assign合并
+// A是发送方，实现第二个参数
+const mapDispatchToProps = (dispatch) => {
+  return {
+    sendAction: () => {
+      dispatch({
+        type: 'add_action'
+      })
+    }
+  }
+}
+export default connect(null, mapDispatchToProps)(Home);
