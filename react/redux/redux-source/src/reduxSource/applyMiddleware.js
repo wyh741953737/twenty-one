@@ -13,7 +13,8 @@ export default function applyMiddleware(...middlewares) {
 
     const middlewareAPI = {
       getState: store.getState,
-      dispatch: (...args) => dispatch(...args),
+      dispatch: (...args) => dispatch(...args), // 利用闭包拿到增强后的dispatch
+      // dispatch: store.dispatch // 这样拿到的dispatch是原始的dispatch
     }
     const chain = middlewares.map((middleware) => middleware(middlewareAPI))
     const middle = compose(...chain) // f() { return(a(b(...arguments)))}

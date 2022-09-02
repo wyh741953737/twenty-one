@@ -10,6 +10,9 @@ const reducer = (state=initState, action) => {
      return Object.assign({}, state, action)
     case 'add_action':
       return { count: state.count+1 }
+    case 'sendAction': {
+      return { count: state.count+1 }
+    }
     default:
       return state
   }

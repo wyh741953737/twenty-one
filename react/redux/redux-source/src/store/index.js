@@ -2,9 +2,10 @@ import { legacy_createStore as createStore, applyMiddleware } from '../reduxSour
 
 import { reducer } from './reducer'
 
-function M1 ({getState}) {
+function M1 ({getState, dispatch}) {
   return (next) => {
     return (action) => {
+      console.log('==dispatch===', dispatch)
       console.log('M1 开始')
       // 调用middleware链中下一个middleware的dispatch
       next(action)
@@ -33,12 +34,6 @@ function M3 ({getState}) {
   }
 }
 
-function reducers (state,action) {
-  if(action.type === 'ADD') {
-    console.log('======')
-  }
-  return {}
-}
-const store = createStore(reducers, {}, applyMiddleware(M1, M2, M3))
+const store = createStore(reducer, {}, applyMiddleware(M1, M2, M3))
 store.dispatch({type: 'ADD'})
 export default store

@@ -21,9 +21,13 @@ export default function compose(...funcs) {
   const res =  funcs.reduce((a, b) => {
     console.log('=====', a)
     console.log('-----', b)
-    return (...args) => {
-      return a(b(...args))
+    const res2 = (...args) => {
+      const result =  a(b(...args))
+      console.log('result----', result)
+      return result
     }
+    console.log('res2==', res2)
+    return res2
   })
   return res
 }
