@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    // 写一个before函数，在执行A函数执行前调用。扩展方法
+    // AOP面向切片编程，将原有函数切开，加点东西
+    function say (a,b) {
+      console.log('say', a, b)
+    }
+    Function.prototype.before = function(cb) {
+      return (...args) => {
+        cb()
+        this(...args)
+      }
+    }
+    let beforeSay = say.before(function() {
+      console.log('调用say之前做一些处理')
+    })
+    // beforeSay('哈哈', '你好')
+
+    // 函数科里化
+    function isType(type) {
+      return function (value) {
+        return Object.prototype.toString.call(value) === `[object ${type}]`
+      }
+    }
+    // const isArray = isType('Array')
+    // isArray([])
+
+    // 通用科里化
+    function currying (fn, arr = []) {
+      let len = fn.length
+      return function(...args) {
+        arr = [...arr, ...args]
+        if(arr.length < len) {
+          return currying(fn, arr)
+        } else {
+          return fn(...arr)
+        }
+      }
+    }
+    // function sum (a,b,c,d,e,f) {
+    //   return a+b+c+d+e+f
+    // }
+    // const isString = currying(isType)('String')
+    // // console.log(isString('ss'))
+
+    // const isArray = currying(isType)('Array')
+    // console.log(isArray([]))
+    // console.log(isArray('string'))
+
+    // const result = currying(sum)(1,2)(3,4)(5)(6)
+    // console.log(result)
+    // 函数反科里化
+
+  // // 多个异步请求，如何同时获取最终结果
+  // const fs = require('fs')
+  // const scool = {}
+
+  // fs.readFile('./age.txt', 'utf8', function(err, data) {
+  //   scool.age = data
+  //   cb()
+  // })
+  // fs.readFile('./name.txt', 'utf8', function(err, data) {
+  //   scool.name = data
+  //   cb()
+  // })
+
+  // function after(times, cb) {
+  //   return function() {
+  //     if(--times === 0) {
+  //       cb()
+  //     }
+  //   }
+  // }
+  // const cb = after(2, function() {
+  //   console.log(scool)
+  // })
+  </script>
+</body>
+</html>
