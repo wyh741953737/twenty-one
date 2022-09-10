@@ -11,7 +11,9 @@ export default {
   name: 'Home',
   methods: {
     goChild() {
-      
+      this.$router.push({
+        path: '/child'
+      })
     }
   },
 }
