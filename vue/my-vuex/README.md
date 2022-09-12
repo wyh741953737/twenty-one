@@ -1,24 +1,8 @@
-# my-vuex
+Vue.use默认会使用插件的install方法
 
-## Project setup
-```
-yarn install
-```
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
+vue中要dispatch一个action， commit一个mution
+getters用于计算，
 
-### Compiles and minifies for production
-```
-yarn build
-```
 
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+redux中state， dispatch， action，

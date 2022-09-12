@@ -200,3 +200,24 @@ $el在mounted以后才能被访问，$data在created阶段能被访问到
 
 keep-alive：vue自带的组件，缓存组件提升性能
 使用场景：缓存组件
+
+
+### 在create里执行nextTick(cb)
+1：nextTick函数内部将cb回调添加到callback里。
+2：if(!pending) { pending = true timerFunc()}
+timerFunc内执行Promise.resolve().then(flushCallback)
+flushCallback内会将pending=false，遍历callbacks，一个个执行
+执行cb.call(),cb改了data中某个数据
+会先触发get，赋值的时候触发set，set赋值完后还会dep.notify通知更新
+
+
+notify：会遍历subs，执行subs[i].update()更新
+
+Watcher.prototype.update会执行quequWatcher函数
+queueWatcher内部会拿到Watcher实例的id，判断之前存过没有，如果没，存进去，如果是flushing会queue.splice(i+1,0,watcher)，否则queue.push(watcher)
+
+flushSchedulerQueue() {
+  获取时间戳，
+  对queue排序
+  遍历queue，执行queue[i].run也就是watcher.run()
+}

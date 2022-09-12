@@ -1,6 +1,6 @@
 import { legacy_createStore as createStore, applyMiddleware } from '../reduxSource'
 
-import { reducer } from './reducer'
+import rootReducer from './reducer'
 
 function M1 ({getState, dispatch}) {
   return (next) => {
@@ -34,6 +34,6 @@ function M3 ({getState}) {
   }
 }
 
-const store = createStore(reducer, {}, applyMiddleware(M1, M2, M3))
+const store = createStore(rootReducer, {}, applyMiddleware(M1, M2, M3))
 store.dispatch({type: 'ADD'})
 export default store

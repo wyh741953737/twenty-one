@@ -1,0 +1,2 @@
+createApp内部会得到app，app上有很多方法，比如mount后，还会写mount方法
+调用mount后，得到proxy并返回出去

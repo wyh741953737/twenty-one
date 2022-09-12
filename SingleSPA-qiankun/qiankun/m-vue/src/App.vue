@@ -8,6 +8,39 @@
   </div>
 </template>
 
+<script>
+export default {
+  data() {
+    return {}
+  },
+  mounted() {
+    function getResult(arr) {
+      let outResult=[]
+      let a = arr
+      for(let i = 0; i < a.length; i++) {
+        if (a.length === 0) {
+          outResult =  a[i].flat()
+          console.log('--', outResult)
+        } else{
+            let emptyArray = []
+            outResult.forEach(item=>{
+              a[i].forEach(value=>{
+                 console.log(item, value)
+                  if(item !== value) {
+                    emptyArray.push(item+value)
+                  }
+              })
+            })
+            outResult = emptyArray
+        }
+      }
+      console.log(outResult)
+      return outResult
+    }
+    getResult([["A1", "A2"],["B1", "B2"]])
+  },
+}
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

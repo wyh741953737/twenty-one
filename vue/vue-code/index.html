@@ -11,9 +11,8 @@
 
 <body>
   <div id="app">
-    <!-- <h1 v-html="str" @click="clickStr" id="h1s"></h1>
-    <h2>{{type}}</h2> -->
-    <h2 v-pre>{{str}}</h2>
+    <h1 v-html="str" @click="clickStr" id="h1s"></h1>
+    <h2>{{type}}</h2>
   </div>
   <script>
   new Vue({
@@ -37,6 +36,11 @@
           }
         }
       },
+      created() {
+        this.$nextTick(() => {
+          this.type.name = 'nextTick'
+        })
+      },
       mounted() {
         this.type.name = '我在mounted改了数据'
         // alert(this.type.name)
@@ -47,18 +51,6 @@
         // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件
         // 发布订阅模式：订阅者把自己想订阅的事注册到调度中心，当发布者发布这个事件，由调度中心统一调度
  
-  </script>
-  <script>
-
-    function getList () {
-      setTimeout(() => {
-        return '哈哈'
-      }, 20000);
-    }
-    async function getData () {
-      const res = await getList()
-      
-    }
   </script>
 </body>
 

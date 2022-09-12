@@ -1,9 +1,6 @@
-const initState = {
-  value: '默认值',
-  count: 0
-}
+import { combineReducers } from "../reduxSource"
 
-const reducer = (state=initState, action) => {
+const reducer1 = (state=0, action) => {
   console.log('reducer', state, action)
   switch (action.type) {
     case 'send_type': 
@@ -17,7 +14,15 @@ const reducer = (state=initState, action) => {
       return state
   }
 }
-
-module.exports = {
-  reducer
+const reducer2 = (state=1, action) => {
+  console.log('reducer', state, action)
+  switch (action.type) {
+    case 'send_type': 
+     return Object.assign({}, state, action)
+    default:
+      return state
+  }
 }
+
+debugger
+export default combineReducers({reducer1, reducer2})

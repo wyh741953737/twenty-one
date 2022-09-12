@@ -58,11 +58,8 @@ function assertReducerShape(reducers) {
 
     if (typeof initialState === 'undefined') {
       throw new Error(
-        `The slice reducer for key "${key}" returned undefined during initialization. ` +
-          `If the state passed to the reducer is undefined, you must ` +
-          `explicitly return the initial state. The initial state may ` +
-          `not be undefined. If you don't want to set a value for this reducer, ` +
-          `you can use null instead of undefined.`
+        `部分reducer的key在初始化阶段 "${key}" 返回了undefined。` +
+          `如果传给reducer的state是undefined,你必须明确地return初始的state.这个初始的state可能不是undefined.如果你想给reducer设置一个值你可以使用null而不是undefined.`
       )
     }
 
@@ -72,82 +69,29 @@ function assertReducerShape(reducers) {
       }) === 'undefined'
     ) {
       throw new Error(
-        `The slice reducer for key "${key}" returned undefined when probed with a random type. ` +
-          `Don't try to handle '${ActionTypes.INIT}' or other actions in "redux/*" ` +
-          `namespace. They are considered private. Instead, you must return the ` +
-          `current state for any unknown actions, unless it is undefined, ` +
-          `in which case you must return the initial state, regardless of the ` +
-          `action type. The initial state may not be undefined, but can be null.`
+        `部分reducer的key在初始化阶段 "${key}" 返回了undefined。使用随机类型探查时 ` +
+          `不要在redux/*里尝试处理 '${ActionTypes.INIT}'或者其他类型actions` +
+          `namespace.他们被人为是私有的. 相反, 任何未知的actions你必须返回` +
+          `当前状态state, 除非它是undefined, ` +
+          `这种情况下你必须返回初始的state, 不管action的类型` +
+          `初始化的 state可以是null但不能是undefined`
       )
     }
   })
 }
 
-/**
- * Turns an object whose values are different reducer functions, into a single
- * reducer function. It will call every child reducer, and gather their results
- * into a single state object, whose keys correspond to the keys of the passed
- * reducer functions.
- *
- * @param {Object} reducers An object whose values correspond to different
- * reducer functions that need to be combined into one. One handy way to obtain
- * it is to use ES6 `import * as reducers` syntax. The reducers may never return
- * undefined for any action. Instead, they should return their initial state
- * if the state passed to them was undefined, and the current state for any
- * unrecognized action.
- *
- * @returns {Function} A reducer function that invokes every reducer inside the
- * passed object, and builds a state object with the same shape.
- */
 export default function combineReducers(reducers) {
   const reducerKeys = Object.keys(reducers)
   const finalReducers = {}
   for (let i = 0; i < reducerKeys.length; i++) {
     const key = reducerKeys[i]
-
-    if (process.env.NODE_ENV !== 'production') {
-      if (typeof reducers[key] === 'undefined') {
-        warning(`No reducer provided for key "${key}"`)
-      }
-    }
-
     if (typeof reducers[key] === 'function') {
       finalReducers[key] = reducers[key]
     }
   }
   const finalReducerKeys = Object.keys(finalReducers)
 
-  // This is used to make sure we don't warn about the same
-  // keys multiple times.
-  let unexpectedKeyCache
-  if (process.env.NODE_ENV !== 'production') {
-    unexpectedKeyCache = {}
-  }
-
-  let shapeAssertionError
-  try {
-    assertReducerShape(finalReducers)
-  } catch (e) {
-    shapeAssertionError = e
-  }
-
   return function combination(state = {}, action) {
-    if (shapeAssertionError) {
-      throw shapeAssertionError
-    }
-
-    if (process.env.NODE_ENV !== 'production') {
-      const warningMessage = getUnexpectedStateShapeWarningMessage(
-        state,
-        finalReducers,
-        action,
-        unexpectedKeyCache
-      )
-      if (warningMessage) {
-        warning(warningMessage)
-      }
-    }
-
     let hasChanged = false
     const nextState = {}
     for (let i = 0; i < finalReducerKeys.length; i++) {
@@ -158,11 +102,11 @@ export default function combineReducers(reducers) {
       if (typeof nextStateForKey === 'undefined') {
         const actionType = action && action.type
         throw new Error(
-          `When called with an action of type ${
-            actionType ? `"${String(actionType)}"` : '(unknown type)'
-          }, the slice reducer for key "${key}" returned undefined. ` +
-            `To ignore an action, you must explicitly return the previous state. ` +
-            `If you want this reducer to hold no value, you can return null instead of undefined.`
+          `当执行action的type为 ${
+            actionType ? `"${String(actionType)}"` : '(未知类型)'
+          }, 部分reducer的key"${key}" 返回了undefined. ` +
+            `为了忽视action, 你必须明确返回上一次的state. ` +
+            `如果你想让该reducer没有值, 你可以返回 null而不是undefined.`
         )
       }
       nextState[key] = nextStateForKey

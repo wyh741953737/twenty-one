@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   entry: './src/main.js',
   output: {
-    path: path.resolve(__dirname, './dist'),
+    path: path.resolve(__dirname, 'dist'),
     filename: 'js/[name].js',
     clean: true
   },
@@ -13,10 +13,20 @@ module.exports = {
       {
         test: /\.js$/,
         // use: ['./loaders/test-async.js', './loaders/test-loader.js']
-        loader: './loaders/banner-loader',
+        loader: './loaders/babel-loader',
         options: {
-          author: '张三'
+          // author: '张三'
+          presets: ['@babel/preset-env']
         }
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/,
+        loader: './loaders/file-loader',
+        type: 'javascript/auto' // 禁止webpack默认处理图片，只使用file-loader处理
+      },
+      {
+        test: /\.css$/,
+        use: ['./loaders/style-loader', 'css-loader']
       }
     ]
   },
@@ -25,5 +35,10 @@ module.exports = {
       template: path.resolve(__dirname, './public/index.html')
     })
   ],
-  mode: 'development'
+  mode: 'development',
+  devServer: {
+    host: 'localhost',
+    port: 4000,
+    open: true
+  }
 }
