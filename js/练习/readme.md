@@ -306,7 +306,8 @@ react的更新机制
 SCU源码中会判断constructor原型上的isPureComponent有没有，如果有就不走默认true，去调shallowEqual(pldProps,newProps) shallow浅层
 函数组件使用React.Memo() memo其实是一个高阶组件 memo(function ComA() {})
 
-### SQL注入 主要是针对数据库的，用户提交数据的SQL语句不安全 防御： 参数化查询：也叫预处理语句： 1：指定查询结构，用户输入预留占位符 2：指定占位符的内容
+### SQL注入
+ 主要是针对数据库的，用户提交数据的SQL语句不安全 防御： 参数化查询：也叫预处理语句： 1：指定查询结构，用户输入预留占位符 2：指定占位符的内容
 ### XSS跨站脚本攻击，
 将恶意代码植入到其他用户页面，其他用户在观看网页时候，恶意脚本就会执行。 比如做个假的登陆界面攻击成功后，攻击者可以得到私密网页内容和Cookie等  
 XSS分类： 反射式XSS： 服务器未对用户提交的表单数据或者URL无害化处理，响应后浏览器解析执行XSS代码。这个过程像一次反射
@@ -716,7 +717,7 @@ select使用value和change事件
 
 ### hash模式和history模式和abstract模式
 hash模式：浏览器“#”，以及后面的都成为hash，虽然在url后面有#。但是http请求中没有，用来指导浏览器动作，hash不会重加载页面
-  
+
 history：采用h5新特性，提供2个新方法：pushState和replaceSatte对浏览器历史记录栈修改，以及popState事件的监听到状态变更
 abstract：支持所有js运行缓存，nodejs，如果发现没有浏览器的API会强制进入这个模式
 ### vue路由传参
