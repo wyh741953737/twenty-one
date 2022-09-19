@@ -13,10 +13,11 @@ class Compile {
   compile(el) {
     const childNodes = el.childNodes
     childNodes.forEach(node => {
+
       if(this.isElement(node)) {
         console.log('编译元素'+node.nodeName)
         this.compileElement(node)
-      } else if(this.isInter(node)) {
+      } else if(this.isInter(node)) { // {{age}}
         console.log('编译插值绑定'+node.textContext)
         this.compileText(node)
       }
@@ -53,7 +54,8 @@ class Compile {
     const nodeAttrs = node.attributes
     Array.from(nodeAttrs).forEach(attr => {
       const attrName = attr.name
-      const exp = attr.value
+      const exp = attr.value // v-model="text" exp=tex, v-click="handler" exp=handler函数
+      // v-clock,v-once,v-model
       if(this.isDirective(attrName)) {
         const dir = attrName.substring(2)
         this[dir] && this[dir](node, exp)
@@ -67,11 +69,6 @@ class Compile {
     node.textContext = this.$vm[exp]
   }
 }
-
-
-
-
-
 
 
 

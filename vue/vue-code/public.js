@@ -7,13 +7,14 @@ function Hunter(name, level) {
   this.list = []
 }
 
+// 通知
 Hunter.prototype.public = function(money) {
   console.log(this.level+'猎人'+this.name+'寻求帮助')
   this.list.forEach(item => {
     item(money)
   })
 }
-
+// 添加依赖
 Hunter.prototype.subscribe = function(target, fn) {
   console.log(this.level+'猎人'+this.name+'订阅了'+target.name)
   target.list.push(fn)
@@ -41,7 +42,7 @@ const HunterUnion = {
     }
     this.topics[topic].push(fn)
   },
-  pubulish: function(topic, money) {
+  publish: function(topic, money) {
     if(!this.topics[topic]) return
     for(let fn of this.topics[topic]) {
       fn(money)
@@ -59,6 +60,6 @@ HunterSub.prototype.subscribe = function(topic, fn) {
 }
 
 HunterSub.prototype.public = function(topic, money) {
-  HunterUnion.pubulish(topic, money)
+  HunterUnion.publish(topic, money)
 }
 

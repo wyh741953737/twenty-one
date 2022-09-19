@@ -3891,17 +3891,15 @@
 
   function initLifecycle (vm) {
     var options = vm.$options;
-
-    // locate first non-abstract parent
-    var parent = options.parent;
-    if (parent && !options.abstract) {
+    var parent = options.parent; // 拿到父组件实例
+    if (parent && !options.abstract) { // 抽象组件，比如keep-alive
       while (parent.$options.abstract && parent.$parent) {
         parent = parent.$parent;
       }
-      parent.$children.push(vm);
+      parent.$children.push(vm); // 让父组件记录自己
     }
 
-    vm.$parent = parent;
+    vm.$parent = parent; // 创建组件时会记录父组件是谁
     vm.$root = parent ? parent.$root : vm;
 
     vm.$children = [];
@@ -4634,7 +4632,7 @@
     var keys = vm.$options._propKeys = [];
     var isRoot = !vm.$parent;
     // root instance props should be converted
-    if (!isRoot) {
+    if (!isRoot) { // 只有根的属性需要是响应式的，因为组件接收的属性一般都是从父组件传过来的，传过来的属性一般都是响应式的
       toggleObserving(false);
     }
     var loop = function ( key ) {
@@ -4650,7 +4648,7 @@
             vm
           );
         }
-        defineReactive$$1(props, key, value, function () {
+        defineReactive$$1(props, key, value, function () { // 将属性定义在vm._props上
           if (!isRoot && !isUpdatingChildComponent) {
             warn(
               "Avoid mutating a prop directly since the value will be " +
@@ -4662,11 +4660,8 @@
           }
         });
       }
-      // static props are already proxied on the component's prototype
-      // during Vue.extend(). We only need to proxy props defined at
-      // instantiation here.
       if (!(key in vm)) {
-        proxy(vm, "_props", key);
+        proxy(vm, "_props", key); // 将属性代理到_props上
       }
     };
 
@@ -4681,11 +4676,6 @@
       : data || {};
     if (!isPlainObject(data)) {
       data = {};
-      warn(
-        'data functions should return an object:\n' +
-        'https://vuejs.org/v2/guide/components.html#data-Must-Be-a-Function',
-        vm
-      );
     }
     // proxy data on instance
     var keys = Object.keys(data);
@@ -5050,10 +5040,6 @@
   }
 
   function Vue (options) {
-    if (!(this instanceof Vue)
-    ) {
-      warn('Vue is a constructor and should be called with the `new` keyword');
-    }
     this._init(options);
   }
 
@@ -5062,8 +5048,6 @@
   eventsMixin(Vue);
   lifecycleMixin(Vue);
   renderMixin(Vue);
-
-  /*  */
 
   function initUse (Vue) {
     Vue.use = function (plugin) {

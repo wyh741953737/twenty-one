@@ -13,8 +13,13 @@
   <div id="app">
     <h1 v-html="str" @click="clickStr" id="h1s"></h1>
     <h2>{{type}}</h2>
+    <my-component></my-component>
   </div>
   <script>
+  Vue.component('my-component', {
+    template: '<div>A custom component!</div>'
+  })
+
   new Vue({
       el: '#app',
       data: {
@@ -47,8 +52,7 @@
       },
     })
       // 观察者：订阅者，watcher。   被观察者：被订阅的变量，依赖，deps
-        // 观察者模式：一对多，是一种行为模式，行为模式关注的是对象之间的通信，
-        // 观察者模式：观察者直接订阅发布者，当主题被激活时会触发观察者的事件
+        // 观察者模式：一对多，是一种行为模式，行为模式关注的是对象之间的通信，观察者直接订阅发布者，当主题被激活时会触发观察者的事件
         // 发布订阅模式：订阅者把自己想订阅的事注册到调度中心，当发布者发布这个事件，由调度中心统一调度
  
   </script>
