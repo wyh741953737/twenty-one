@@ -32,8 +32,17 @@ export default defineConfig({
         postcss: {}, // 配置postcss相关的
         build: {
             rollupOptions: { // 配置rollup一些构建策略。vite在构建生产环境的时候要降级，线上的要考虑到兼容性问题，将任务交给rollup
+                input: { // 多入口，多入口不分包的时候，就会在多尔入口文件中引入相同的模块。 
+                    main: path.resolve(__dirname, './main.html'),
+                    product: path.resolve(__dirname, './product.html')
+                },
                 output: {
-                    assetFileNames: '[hash].[name].[txt]'
+                    assetFileNames: '[hash].[name].[txt]',
+                    manualChunks: (id) => {
+                        if(id.includes('node_modules')) {
+                            return 'vendor'
+                        }
+                    }
                 }
             },
             assetsInlineLimit: 4096, // 4kb, 对小于4kb的图片转base64
