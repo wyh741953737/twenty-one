@@ -4,7 +4,7 @@ import vnode from './vnode'
 //   h('li', {}, '苹果'),
 //   h('li', {}, h('div', {}, '我是香蕉')),
 // ])
-// 函数重载
+// 函数重载：多个函数名字相同，但是形参列表不同，返回值类型也可能不同
 export default function (sel, data, c) {
   if(arguments.length < 3) {
     alert('参数必须为3个')
@@ -22,6 +22,8 @@ export default function (sel, data, c) {
     }
     return vnode(sel, data, children, undefined, undefined)
    } else if(typeof c === 'object' && c.hasOwnProperty('sel')) {
+    const children = [c]
+    return vnode(sel, data, children, undefined, undefined)
    } else {
      throw new Error('传入的第三个参数类型不对')
    }
