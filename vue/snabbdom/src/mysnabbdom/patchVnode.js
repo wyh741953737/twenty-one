@@ -11,14 +11,14 @@ export default function patchVnode(oldVnode, newVnode) {
         oldVnode.elm.innerText = newVnode.text
       }
     } else {
-      // 新老节点都有children
+      // 老节点有children
       if(oldVnode.children !== undefined && oldVnode.children.length > 0) {
         updateChildren(oldVnode.elm, oldVnode.children, newVnode.children)
-      } else {
+      } else { // 
         oldVnode.elm.innerHTML = ''
         for(let i = 0; i < oldVnode.children.length; i++) {
+          let dom = createElement(vnode.children[i])
           oldVnode.elm.appendChild(dom)
-          let dom = createElement(vnode.children)
         }
       }
     }
