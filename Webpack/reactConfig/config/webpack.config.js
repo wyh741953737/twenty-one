@@ -136,12 +136,6 @@ module.exports = {
     minimize: isProduction,
     minimizer: [new CssMinimizerWebpackPlugin(), new TerserWebpackPlugin()]
   },
-    runtimeChunk: { // 代码分割导致缓存失效，配置runtimeChuns
-      name: entrypoint => `runtime~${entrypoint.name}.js`
-    },
-    minimize: isProduction,
-    minimizer: [new CssMinimizerWebpackPlugin(), new TerserWebpackPlugin()]
-  },
   resolve: {
     extensions: [".jsx", ".js", ".json"] // 自动补全文件扩展名
   },

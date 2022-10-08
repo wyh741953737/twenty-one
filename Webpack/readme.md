@@ -10,12 +10,11 @@ webpack 4.41.5
 webpack-cli 3.3.10
 webpack-dev-server 3.10.1
 
-
 webpack5最重大改变：1：持久化缓存，2：tree-shaking 3：联邦模块
 
-
 ### 持久化缓存：
-缓存生成的webpack模块和chunk来改善构建速度，webpack5默认开启缓存，缓存默认是内存里，可以对cache设置为memory或filesystem。webpack追踪每个模块的依赖，并创建文件系统快照，此快照会和真实文件系统对照，检测到差异，触发对应模块的重写构建（将打包出来的文件缓存做一个快照，在node_modules中的.cache里）
+缓存生成的webpack模块和chunk来改善构建速度，webpack5默认开启缓存，缓存
+默认是内存里，可以对cache设置为memory或filesystem。webpack追踪每个模块的依赖，并创建文件系统快照，此快照会和真实文件系统对照，检测到差异，触发对应模块的重写构建（将打包出来的文件缓存做一个快照，在node_modules中的.cache里）
 cache配置时，type是filesystem时不要使用cnpm安装。webpack5持久化缓存和cnpm安装包包名有冲突，导致webpack5假死，无法生成缓存
 
 #### 资源模块：是一种模块类型，允许使用资源文件（字体，图标等）而不需配置额外loader
@@ -39,7 +38,7 @@ webpack5支持在请求中处理协议，支持data，支持base64或原始编�
 webpack5之前没有从entry打包的chunk文件，都会以1,2,3...的文件命名方式输出，删除某些文件可能会导致缓存失效。
 生产模式下，默认启用这些功能chunkIds:"deterministic"
 moduleIds:"deterministic"此算法采用确定性的方式将短数字id，短hash分配给moduleIds和chunkIds。
-chunkId设置为determinitic，则output中chunkFilename的[name]会被替换成确定性的短数字id，虽然chunkId不变，但是更改chunk内容，chunkhash还是会变的
+chunkId设置为deterministic，则output中chunkFilename的[name]会被替换成确定性的短数字id，虽然chunkId不变，但是更改chunk内容，chunkhash还是会变的
 可选值：natural（按顺序比如1,2），named（方便调试的可读性id比如src_two_js.js) deterministic（根据模块名生成的hash值)0
 #### 移除Node.js的polyfill
 webpack4带了许多Node.js核心模块的polyfill，一旦模块中使用了任何核心模块比如crypto，这些模块就会被自动启用
@@ -61,17 +60,13 @@ optimization： {
 
 查看webpack配置
 开发环境：npx vue-cli-service inspect --mode development
-生产环境：npx vue-cli-service insoect --mode production
+生产环境：npx vue-cli-service inspect --mode production
 将输出导入到js文件
-开发环境：npx vue-cli-service inspect --mode development >> webpack.cinfig.development.js
-生产环境：npx vue-cli-service inspect --mode production >> webpack.cinfig.production.js
+开发环境：npx vue-cli-service inspect --mode development >> webpack.config.development.js
+生产环境：npx vue-cli-service inspect --mode production >> webpack.config.production.js
 
 webpack默认会生成源代码，不想的话可以再package.json中配置
 "build": "cross-env GENERATE_SOURCEMAP=false node script/build.js"
-
-css-loader: css=》webpack能识别
-style-loaer：动态创建style放添加到html
-less-loader：将less转成css
 
 raw-loader：将文件导入为字符串
 file-loader：将文件编译成webpack能够识别的文件原封不动输出，
@@ -119,8 +114,6 @@ url-loader：在file-loader基础上增加了小于多大的图片转化成base6
             }]        
         ]    
     }
-
-html-webpack-plugin: template：../index.html
 webpack-dev-server自动化 devServer: {host: 'localhost', port:8080, open:true自动打开浏览器} 开发模式下没有任何输出，内存中编译打包（不会生成dist目录）
 
 生产模式：
@@ -134,6 +127,7 @@ new MiniCssExtractPlugin({
 })
 
 css兼容性：postcss-loader
+postcss：编译样式文件（嵌套函数变量）成原生css，再将高级css降级，最后前缀补全（-webkit-)
 npm i postcss-loader postcss(postcss-loader依赖于postcss也要下载) postcss-preset-env（给postcss解决兼容问题）
 要放在css-loader下面，less-loader上面
 {loader: 'postcss-loader',options: {postcssOptions: {plugin: ['postcss-preset-env']}}} 能解决大多数兼容性问题
@@ -153,7 +147,7 @@ eval
 cheap:只关心行不关心列
 inline：行内，不生成单独文件
 
-开发模式：cheap-module-source-map 优点：打包速度快，只包含映射，缺点是没有列映射’
+开发模式：cheap-module-source-map 优点：打包速度快，只包含行映射，缺点是没有列映射’
 生产模式：source-map 优点是包含行、列映射，缺点是打包编译速度慢
 
 module.exports = {
@@ -186,9 +180,8 @@ cache：缓存，每次打包时js都有经过eslint检测和babel编译，速�
 减少代码体积：tree-shaking依赖js模块化
 生产环境：webpack默认已经开启了这个功能，
 减少babel体积：babel会为编译的每个文件插入辅助代码，让体积变大，你可以将这些辅助代码作为一个独立模块避免重复引入
-    @babel/plugin-transform-runtime禁用babel自动对每个文件的tuntime注入
-    {loader：“babel-loader"， options：{cacheDirectory：true，cacheCompression：false，plugins：['@babel/plugin-transform-runtime']}} // 减少代码体积
-
+    @babel/plugin-transform-runtime禁用babel自动对每个文件的runtime注入
+    {loader：“babel-loader"， options：{cacheDirectory：true，cacheCompression：false，plugins：['@babel/plugin-transform-runtime']}} 
 压缩图片：
     本地静态图片才需要压缩，image-minimizer-webpack-plugin imagemin
     无损压缩：imagemin-gifsicle imagemin-jpegtran imagemin-optipng imagemin-svgo
@@ -249,10 +242,11 @@ output: {
 output: {
     assetModuleFilename: 'static/media/[hash:10][txt][query]' // 图片，字体等通过type: asset处理资源命名方式
 }
-preload：浏览器空闲时候加载
-    preload：立即加载，prefetch：空闲时候加载，都只会加载资源并不执行，都有缓存
+    chrome有4种缓存：http cache，memory chache，service-worker，push cache，
+    preload和prefetch都存在http chache上
+    preload：提前加载，prefetch：空闲时候加载，都只会加载资源并不执行，都有缓存
     preload加载优先级更高，只加载当前页面用到的资源，prefetch加载优先级低，也可加载下一个页面用到的资源
-    兼容性差，preload相对于preetch兼容性好一点
+    兼容性差，preload相对于prefetch兼容性好一点
     可以使用：@vue/preload-webpack-plugin
     new PreloadWebpackPlugin({
         rel:'preload',
@@ -303,7 +297,12 @@ PWA：渐进式网络应用程序，离线访问，内部通过service workers�
         3：network cache对资源文件更好命名，将来做缓存
         4：core-js，对js兼容性处理，运行在低版本浏览器
         5：PWA离线访问
-        
+### webpack工作流程
+1：将webpack.config.js的配置文件和shell参数合并
+2：创建compiler对象，compiler内部会实例化Tapable的钩子事件
+3：注册插件，插件会有个apply方法会去执行compile.run方法开始编译
+4：获取入口文件，找到匹配的loader处理文，调用parse将文件处理成ast，编译的过程会收集当前模块的依赖，递归编译入口的依赖模块，将编译后的模块加入到this,modules中，将编译结束后的模块添加到this.entries
+5：构建chunks，通过this.modules和this.emtries依赖生成chunks，根据chenks生成assets保存：{[文件名]:[文件内容]}，根据asstts输出编译文件到硬盘
 
 
 plugin工作原理：
@@ -335,26 +334,31 @@ webpack生命周期：
 6：compiler.afterCompile()
 7：compiler.emit
 8：compiler.emitAeests
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 plugin执行插件的contructor
-2：webpack创建compiler对象
-3：遍历所有plugins中插件，调用插件的apply方法
-4：执行剩下编译流程，触发各个hooks事件
+### 如何加速webpack打包进程
+开发环境：
+生产环境：
+### 如何提取公共模块
+多入口打包后体积大，相同模块在不同入口没得到复用，bundle直接独立，我们要将公共模块抽离单独打包
+webpack4自动使用splitChunks对资源进行拆分
+optimization: {
+    splitChunks: {
+        chunks: 'async',
+        minSize: 2000,
+        cacheGroups: {
+            vendor: {
+                test: '/react|lodash' //匹配到就提取chunk
+            },
+            default： {
 
-
-### 模块化
-1：文件划分方式，每个文件就是一个模块
-    缺点：命名冲突，全局作用域被污染，没有私有空间（模块内的成员都可被外部访问或者修改），无法管理模块间的依赖关系，在维护过程中很难分辨每个成员的所属模块
-2：命名空间，约定每个模块只允许暴露一个全局对象，所以模块成员要被挂到这个全局模块当中。解决了命名冲突问题，但是其他问题还在
-3：IIFE立即执行函数，为模块提供一个私有空间，暴露到外部的成员可以挂载到全局对象的方式实现。带来了私有成员的概念，私有成员只能在模块内通过闭包访问。
-4：IIFE依赖参数：通过参数声明模块所依赖的模块，让模块间的依赖关系更加明显 (function($) {console.log($)})(jquery)
-以上是早期没有工具和规范下对模块化实现的落地方式（模块的加载还没解决，都是通过script的形式将模块引入到页面中，意味着模块的加载不受代码控制的，时间久了维护起来很麻烦）
-    比如html中依赖模块A，忘了引入。
-    更为理想的方式是在页面中引入一个js入口文件，其余用到的模块都可以通过代码控制，按需加载
-为了统一不同开发者，不同项目之间的差异，需要制定一个行业标准去规范模块化的实现方式
-针对模块加载问题要实现2个需求：一个统一的模块化标准规范，一个可以自动加载模块的基础库
-
-commonJS规范：nodejs中遵循的模块化规范：一个文件就是一个模块，每个模块都有单独作用域，通过module.exports导出成员，再通过require函数载入模块
-在浏览器端直接使用这个规范会出现一些问题，commonjs是以同步的形式加载模块，node执行机制中，启动时加载模块，在代码执行过程中是使用模块所以这种同步方式不会出现问题
-浏览器同步会引起大量同步请求，导致应用运行效率低
-早起制定前端模块化标准时，并没有直接选择commonjs规范，而是专门为浏览器重新设计了一个规范AMD（asynchronous Module definition)即异步模块定义规范
-同期退出require.js除了实现了AMD模块化规范，本身也是很强大的模块加载器
+            }
+        }
+    }
+}
+Dellplugin和DellReferencePlugin插件组合完成，会将配置的公共代码或者第三方包，先打包出来并生成mainfest.json文件
+还需要用htmlwebpackIncludeAssetsPlugin将公共js库插入到html
+### webpack打包流程
+1：初始化参数阶段：将webpack.config.js读取的配置参数和shell命令进行合并得到最终的打包配置参数
+2：开始编译阶段，调用webpack返回一个compile方法，创建compile对象，并且注册各个webpack plugin，找到入口中的entry代码，调用compile.run进行编译
+3：模块编译阶段：从入口模块进行分析调用匹配文件的loader对文件进行分析，同时分析模块依赖的模块，递归进行编译
+4：完成编译阶段：在递归完成后，每个引用模块通过loaders处理完成得到模块间的互相依赖关系
+5：输出文件阶段：整理模块依赖关系，同时将处理后的文件输出到output磁盘中。
