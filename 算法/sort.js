@@ -1,7 +1,6 @@
 let arr = [9, 2, 7, 1, 5, 3, 8, 4, 6]
 
-// 选择排序，选择第i个，遍历n轮，每次2个数进行交换
-// 时间复杂度：O(n^2), 空间复杂度O(1)
+// 选择排序，选择第i个，遍历n轮，每次2个数进行交换,O(n^2), 空间O(1)
 function selectSort(arr) {
    if(arr.length < 2) return arr
    for(let i=0; i<arr.length; i++) {
@@ -13,29 +12,16 @@ function selectSort(arr) {
    }
    return arr
 }
-function selectSort2(arr) {
-  for(let end = arr.length; end >0; end--) {
-    let max = 0
-    for(let begin = 1; begin <= end; begin++) {
-      if(begin > end) {
-        max = begin
-      }
-    }
-    swap(max, end)
-  }
-}
+
 // 冒泡排序 相邻两个比较，比较n-1轮，时间复杂度：O(n^2) 空间复杂度O(1)，稳定排序 
 function bubbleSort(arr) {
    if(arr.length < 2) return arr
    for(let e = arr.length - 1; e > 0; e--) {
-    let endIndex = 0
     for(let i = 0; i < e; i++) {
       if(arr[i] > arr[i+1]) {
         swap(arr, i, j)
-        endIndex = i
       }
     }
-
    }
 }
 
@@ -275,17 +261,6 @@ function sortedArrDistanceLess(arr, k) {
   }
   while(!result.isEmpty()) {
     arr[i++] = result.pop()
-  }
-}
-
-// 堆排序
-function radixSort(arr, L, R, digit) {
-  let radix = 10
-  let i = 0;
-  let j = 0
-  let bucket = new Array(R-L+1)
-  for(let d=1; d<=digit;d++) {
-    
   }
 }
 
