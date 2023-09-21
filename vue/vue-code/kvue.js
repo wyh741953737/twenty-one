@@ -4,7 +4,11 @@ function defineReactive(obj, key, val) {
 
 function proxy(vm, sourceKey) {
   Object.keys(vm[sourceKey]).forEach(key => {
-    Object.defineProperty(vm, key, {
+    Object.defineProperty(vm, 
+      
+      
+      
+      key, {
       get() {
         return vm[sourceKey][key]
       },
