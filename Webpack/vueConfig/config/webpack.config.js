@@ -5,7 +5,7 @@ const EslintWebpackPlugin = require('eslint-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
 const CssMinimizerWebpackPlugin= require('css-minimizer-webpack-plugin')
 const TerserWebpackPlugin = require('terser-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+// const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -30,7 +30,8 @@ module.exports = {
   output: {
     filename: isProduction ? path.resolve(__dirname, '../dist') : undefined,
     chunkFilename: isProduction ? 'static/js/[contenthash].chunk.js' : 'static/js/[name].chunk.js',
-    assetModuleFilename: isProduction ? 'static/media/[contenthash:8][ext][query]' : 'static/media/[hash:8][ext][query]'
+    assetModuleFilename: isProduction ? 'static/media/[contenthash:8][ext][query]' : 'static/media/[hash:8][ext][query]',
+    libraryTarget: 'umd'
   },
   mode: isProduction ? 'production' : 'development',
   devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
@@ -120,7 +121,7 @@ module.exports = {
     runtimeChunk: { // 代码分割导致缓存失效，配置runtimeChuns
       name: entrypoint => `runtime~${entrypoint.name}.js`
     },
-    minimize: isProduction,
+    // minimize: isProduction,
     minimizer: [new CssMinimizerWebpackPlugin(), new TerserWebpackPlugin()]
   },
   resolve: {

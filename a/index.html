@@ -1,0 +1,130 @@
+<!--
+ * @Description: 
+ * @Author: yourName
+ * @Date: 2022-12-07 18:06:07
+ * @LastEditors: wunihong
+ * @LastEditTime: 2022-12-15 16:06:02
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <script src="./debug.js"></script> -->
+    <title>Document</title>
+  </head>
+
+  <body>
+    <script>
+      // 数组包含从0到n的所有整数，但其中缺失了一个，请找出那个缺失的整数，要求时间复杂度为O(N)， 比如输入[3,0,1] 输出：2,
+      const arr = [6, 4, 7, 3, 5, 2, 0, 8]
+      // function findDisappear(arrs) {
+      //   let sums = 0
+      //   let actualSum = 0
+      //   for(let i = 0; i < arrs.length; i++) {
+      //     if(i !== arr.length-1) {
+      //       sums += i
+      //       actualSum += arrs[i]
+      //     } else {
+      //       sums += i
+      //     }
+      //   }
+      //   return sums-actualSum
+      // }
+      function findDisappear(arr) {
+        // 按位异或，两个相同的数按位异或得到0
+        let res = 0
+        for (let i = 0; i <= arr.length; i++) {
+          res = res ^ i ^ arr[i]
+        }
+        return res // 任何值和0异或得到本身，任何值和自己异或得到0，循环的时候等于
+      }
+      // console.log(findDisappear(arr))
+      
+      // console.log(revoteArr(nums, 3))
+      // 一个整型数组nums里除两个数字之外，其他数字都出现了两次，找出这两个只出现一次的数字，时间复杂度O(n),空间复杂度O(N)
+      // 例如输入 nums=[4,1,4,6] 输出 [1,6]或者[6,1]
+      const oneArr = [4, 1, 4, 5, 6, 5]
+      // function findOnce(arr) {
+      //   const result = {}
+      //   for(let i = 0; i < arr.length; i++) {
+      //     if(result[arr[i]]) {
+      //       delete result[arr[i]]
+      //     } else {
+      //       result[arr[i]] = 1
+      //     }
+      //   }
+      //   console.log(result)
+      // }
+      function findOnce(arr, numSize) {
+        let ret = 0
+        for (let i = 0; i < numSize; i++) {
+          ret ^= arr[i]
+        }
+        let target = 1
+        while (target & (ret == 0)) {
+          // 奇和1按位与得1，偶和1按位与得0,0与任何值按位与得0，任何和自己按位与得自己
+          target = target << 1 // 左移1位相当于乘2
+        }
+      }
+      // findOnce(oneArr)
+      // 给你一个数组nums和一个值val，你需要原地移除所有与val的元素，返回移除后数组的新长度
+      // 思路1：找到所以的val一次挪动数据覆盖删除
+      // 思路2：用一个空数组收集，时间复杂度是O(N)但是空间复杂度也是O(N)
+      // 最优的：双指针,++src,++dir
+      const removeArr = [3, 4, , 5, 6, 7, 3, 4, 3]
+      function removeElement(arr, val) {
+        let src = 0
+        let dir = 0
+        while (src < arr.length) {
+          if (arr[src] === val) {
+            ++src
+          } else {
+            arr[dir] = arr[src]
+            ++src
+            ++dir
+          }
+        }
+        return dir
+      }
+      // removeElement(removeArr, 3)
+      // 给你一个有序数组nums请你原地删除重复出现的元素，使每个元素只出现一次，返回删除后数组的新长度，空间O(1)
+      // 思路：数组有序
+      const removeDuplicateArr = [1, 1, 2, 2, 3, 4, 4, 5, 6, 6]
+      function removeDuplicates(arr, size) {
+        if (size === 0) return 0
+        let i = 0,
+          j = 1
+        let dist = 0
+        while (j < size) {
+          if (arr[i] === arr[j]) {
+            ++j
+          } else {
+            arr[dist] = arr[i]
+            ++dist
+            i = j
+            ++j
+          }
+        }
+        arr[dist] = arr[i]
+        ++dist
+        console.log('=========', dist, arr)
+        return dist
+      }
+      // removeDuplicates(removeDuplicateArr, removeDuplicateArr.length)
+      
+
+
+    </script>
+    <script>
+      /*********
+       * 总结：单链表思想
+       * 1：快慢指针，解决寻找中间点，或者判断链表是不是对称(回文), 找倒数第k个数(慢走1，快走k+1)，是否是环形链表(一快一慢没环永远追不上，有环就会有相交的时候)
+       * 2：单链表不能倒着走，但是可以利用递归倒着走，
+       * 3: 有2个链表时双指针走完自己走对方解决交叉问题
+       * 4：有序，说明相同的元素的连续的，通过cur.next=cur.next.next删除
+       * /
+    </script>
+  </body>
+</html>

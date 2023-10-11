@@ -2,18 +2,19 @@
 计算机组成：CPU，硬盘，内存，网卡，
 1946年2月14第一台计算机问世
 
+### linux系统组成
+Linux系统内核（提供调度cpu，调度内存，文件系统，调度网络通讯，IO等）
+系统级应用程序（可理解为出厂自带程序，可供用户快速上手操作系统。比如文件管理器，音乐播放等）
+
 ### linux
 安装方式：真机，虚拟机（vmware workstation， Oracle）
-
-
-
 
 ### 命令大全
 #### cat concatenate ：连接文件并打印到标准输出设备上
 -n = --number 对所有输出的行数编号
--b = --number-nonblank 和-n相似，不过对于空白行不编号
+-b = --number-nonblank 和-n相似，不过对于空白行不编号     
 -s = --squeeze-blank 将多行转为一行  squeeze压榨，挤出，塞入
--v = --show-nonprinting 使用^和M-符号，出了LFD和TAB之外
+-v = --show-nonprinting 使用^和M-符号，除了LFD和TAB之外
 -E = --show-ends 每行结束处显示$
 -T = --show-tabs 将TAB字符显示为^|
 -e = -vE选项
@@ -45,7 +46,7 @@ u：预防意外删除
 -R 递归处理 recursion recursive
 -v 版本编号，设置文件或者目录版本
 -V 显示指令执行过程
-+<属性> 开启文件或者目录的该属性
++<属性> 开启文件或者目录的该属性 
 -<属性> 关闭文件或者目录的该属性
 =<属性> 指定文件或者目录的该属性
 
@@ -168,7 +169,7 @@ echo "两数: $val"
 * / % = == != *号前面必须是反斜杠才能实现乘法
 关系运算符
 -eq 相等 
--ne 不想打
+-ne 不相等
 -gt 左边大于右边
 -lt 左边小于
 -ge大于等于
@@ -210,7 +211,7 @@ then
 
 ### test命令
 -gt -lt -eq, -ne, -ge, -le
-!= = -z -n
+!= = -z -   ；lklkkk
 
 ### 流程控制
 if

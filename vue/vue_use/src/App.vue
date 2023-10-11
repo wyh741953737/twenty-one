@@ -1,19 +1,17 @@
 <template>
   <div id="app">
-    <!-- <filter-comp /> -->
-    <instruct-comp />
+    <img alt="Vue logo" src="./assets/logo.png">
+    <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
 <script>
-// import FilterComp from './view/filters.vue'
-import InstructComp from './view/instruct.vue'
+import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
   components: {
-    // 'filter-comp': FilterComp,
-    'instruct-comp': InstructComp
+    HelloWorld
   }
 }
 </script>

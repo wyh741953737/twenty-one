@@ -10,6 +10,28 @@
 
 <body>
   <script>
+    function debounceNow(fn, time, immediate) {
+      let timer = null
+      return function() {
+        const that = this
+        let args = arguments
+        if(timer) clearTimeout(timer)
+        if(immediate) {
+          let callNow = !time
+          timer = setTimeout(() => {
+            timer = null
+          }, time);
+          if(callNow) fn.apply(that, args)
+        } else {
+          timer = setTimeout(() => {
+            fn.apply(that, args)
+          }, time);
+        }
+      }   
+    }
+
+  </script>
+  <!-- <script>
     function Parent (name) {
       this.name = name
       this.hobby = []
@@ -380,6 +402,7 @@
         }
       }
     }
+
     // 防抖
     function debounce (fn, args) {
       let timer
@@ -391,7 +414,7 @@
         }, delay)
       }
     }
-  </script>
+  </script> -->
 </body>
 
 </html>

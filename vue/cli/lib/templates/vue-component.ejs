@@ -1,0 +1,32 @@
+<!--
+ * @Description: 
+ * @Author: yourName
+ * @Date: 2022-12-19 15:41:07
+ * @LastEditors: wunihong
+ * @LastEditTime: 2022-12-19 15:46:24
+-->
+<template>
+  <div class="<%= data.lowerName %>">
+    <h1>{{msg}}</h1>
+  </div>
+</template>
+<script>
+  export default {
+    name: '<%= data.name %>',
+    props: {
+      msg: String
+    },
+    mixins:[],
+    data() {
+      return {
+        
+      }
+    }
+  }
+</script>
+
+<style scoped>
+  .<%= data.lowerName %> {
+    
+  }
+</style>
