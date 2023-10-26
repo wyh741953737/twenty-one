@@ -1,0 +1,20 @@
+{
+  "name": "vueRealize",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server --open"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^4.5.0",
+    "preview": "^1.0.0",
+    "webpack": "^4.46.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

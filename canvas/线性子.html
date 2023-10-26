@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #F7F9FC;
+      color: #d6e8f1;
+    }
+
+    .wrap {
+      position: absolute;
+      width: 450px;
+      height: 360px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 4px;
+      z-index: 100;
+      box-shadow: darkgrey 1px 1px 10px 1px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="wrap">
+    <div style="margin: 30px;color: black;font-size: 20px;">精准营销管理系统</div>
+    <input
+      style="height: 40px;margin: 20px 50px;width: 300px;padding: 0 20px; border: 1px solid #DCDFE6;color: #DCDFE6;"
+      placeholder="请输入用户名" />
+    <input
+      style="height: 40px;margin: 20px 50px;width: 300px;padding: 0 20px; border: 1px solid #DCDFE6;color: #DCDFE6;"
+      placeholder="请输入密码" />
+    <button
+      style="width: 200px;margin: 20px 130px;background: #2C75DD;height: 40px;border: none;color: #fff;font-size: 18px;border-radius: 4px;">登陆</button>
+  </div>
+  <canvas id="canvas"></canvas>
+  <script>
+    /* 获取画布 */
+    var canvas = document.querySelector("#canvas")
+    var ctx = canvas.getContext("2d")
+    /* 数组，存小球 */
+    var arr = []
+    /* 一共60个球 */
+    var num = 60
+    /* xZou与yZou为鼠标坐标，temp为变量，判断鼠标是否在canvas内 */
+    var xZou, yZou, temp
+
+    /* 绑定窗口大小发生改变事件，让canvas随时铺满浏览器可视区 */
+    window.onresize = resizeCanvas
+    function resizeCanvas () {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      arr.length = 0
+      chushi()
+    }
+    resizeCanvas()
+    /* 初始化数组 */
+    function chushi () {
+      for (let i = 0; i < num; i++) {
+        arr.push({
+          /*指定值之间的随机数: Math.random() * (max - min) + min; */
+          /* 球的x轴随机坐标 */
+          x: 10 + Math.random() * (canvas.width - 20),
+          /* 球的y轴随机坐标 */
+          y: 10 + Math.random() * (canvas.height - 20),
+          /* 球的半径，可以设置随机大小，我就不设置了 */
+          r: 5,
+          /* 球移动距离大小 dx，dy */
+          dx: 10 * Math.random() - 5,
+          dy: 10 * Math.random() - 5,
+          /* 颜色，这是蓝色 */
+          color: "#d6e8f1"
+        })
+      }
+    }
+    /* 绘制小球 */
+    function draw () {
+      for (let i = 0; i < num; i++) {
+        var yuan = arr[i]
+        /* 绘制圆形 */
+        ctx.beginPath()
+        ctx.arc(yuan.x, yuan.y, yuan.r, 0, 3.14 * 2, false)
+        ctx.fillStyle = yuan.color
+        ctx.fill()
+        for (let j = i; j < num; j++) {
+          /* 绘制球与球之间连线，只有x轴与y轴都只相差150内的才连线 */
+          if (Math.abs(yuan.x - arr[j].x) < 150 && Math.abs(yuan.y - arr[j].y) < 150) {
+            /* 绘制连线 */
+            ctx.beginPath()
+            /* ctx.globalAlpha = 0.1; */
+            ctx.moveTo(yuan.x, yuan.y)
+            /* 绘制鼠标坐标与球之间连线，只有x轴与y轴都只相差150内的才连线 */
+            if (Math.abs(yuan.x - xZou) < 150 && Math.abs(yuan.y - yZou) < 150 && temp) {
+              ctx.lineTo(xZou, yZou)
+            }
+            ctx.lineTo(arr[j].x, arr[j].y)
+            ctx.closePath()
+            /* 设置线条颜色，越远透明度越低，用勾股定理判断距离 */
+            let tm = Math.sqrt(Math.abs(yuan.x - arr[j].x) * Math.abs(yuan.x - arr[j].x) + Math.abs(yuan.y - arr[j].y) * Math.abs(yuan.y - arr[j].y)) / 212
+            ctx.strokeStyle = `#d6e8f1`
+            ctx.stroke()
+            /*  ctx.fill(); */
+          }
+
+        }
+      }
+    }
+
+    /* 小球运动 */
+    function updates () {
+      for (let i = 0; i < num; i++) {
+        /* 更新球的坐标，鼠标坐标与球之间只有x轴与y轴都只相差150内的球才会跟着鼠标走 */
+        if (Math.abs(arr[i].x - xZou) < 150 && Math.abs(arr[i].y - yZou) < 150 && temp) {
+          /* 离鼠标越近走越慢 */
+          arr[i].x += -(arr[i].x - xZou) / (10 * Math.random() + 20)
+          arr[i].y += -(arr[i].y - yZou) / (10 * Math.random() + 20)
+        }
+        /* 否则球走的距离与方向为原数组里存放的 */
+        else {
+          arr[i].x += arr[i].dx
+          arr[i].y += arr[i].dy
+        }
+        /* 当球边碰到窗口边时把原来走的距离设置为负数，这样小球会碰撞效果 */
+        if (arr[i].x <= arr[i].r || arr[i].x >= (canvas.width - arr[i].r)) {
+          arr[i].dx = -arr[i].dx
+        }
+        if (arr[i].y <= arr[i].r || arr[i].y >= (canvas.height - arr[i].r)) {
+          arr[i].dy = -arr[i].dy
+        }
+      }
+    }
+    /* 定时器，开始清除，渲染，更新 */
+    chushi()
+    setInterval(function () {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      draw()
+      updates()
+    }, 50)
+
+    /* 鼠标进入canvas事件， */
+    var xZou, yZou, temp
+    canvas.addEventListener('mousemove', function (e) {
+      /* 赋值 */
+      xZou = e.clientX
+      yZou = e.clientY
+      temp = 1
+    })
+    /* 鼠标离开canvas，tmep为0，上面的跟随鼠标运动无效了 */
+    canvas.addEventListener('mouseout', function (e) {
+      temp = 0
+    })
+  </script>
+
+</body>
+
+</html>

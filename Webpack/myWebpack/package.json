@@ -1,0 +1,20 @@
+{
+  "name": "myWebpack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build": "node ./script/build.js",
+    "debug": "node --inspect-brk ./script/build.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/parser": "^7.15.3",
+    "@babel/traverse": "^7.15.0"
+  }
+}

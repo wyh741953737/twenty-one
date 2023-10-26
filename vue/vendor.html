@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <a href="" id="tel">点击打电话</a>
+  <script>
+    async function async1() {
+      console.log(2)
+      await async2()
+      console.log(3)
+      await async3()
+      console.log(0)
+    }
+    async function async3() {
+      console.log('插入')
+    }
+    new Promise((resolve) => {
+      console.log('A')
+      resolve()
+    }).then(() => {
+      console.log('Athen')
+    })
+    async function async2() {
+      console.log(4)
+      return ()=>{}
+    }
+    setTimeout(() => {
+      console.log(6)
+      new Promise((resolve) => {
+        console.log(8)
+        resolve()
+      }).then(() => {
+        console.log(9)
+      })
+    });
+    async1()
+    new Promise((resolve) => {
+      console.log('B')
+      resolve()
+    }).then(() => {
+      console.log('Bthen')
+    })
+    // A
+    // 微任务：Athen async2之后的，
+  </script>
+</body>
+
+</html>

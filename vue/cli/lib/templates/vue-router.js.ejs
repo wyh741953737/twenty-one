@@ -1,0 +1,17 @@
+<!--
+ * @Description: 
+ * @Author: yourName
+ * @Date: 2022-12-19 15:46:49
+ * @LastEditors: wunihong
+ * @LastEditTime: 2022-12-19 15:50:32
+-->
+<!-- 懒加载路由 -->
+const <% data.name %> = () => import('./<%= data.name %>.vue')
+
+export default {
+  path: '<%= data.lowerName %>',
+  name: '<%= data.name %>',
+  component: '<%= data.name %>',
+  children: [
+  ]
+}

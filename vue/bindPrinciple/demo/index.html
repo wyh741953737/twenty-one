@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    const obj = {
+      a: {
+        child1: {
+          son: '曦曦'
+        },
+        child2: {
+          son: '海洋'
+        }
+      },
+      b: {
+        secondChild: 'haihong'
+      },
+      c: ['曦曦', '紫晨']
+    }
+    function def(obj, key, value, enumerable) {
+      Object.defineProperty(obj, key, {
+        enumerable,
+        value,
+        writable: true,
+        configurable: true
+      })
+    }
+
+    function defineReactive(data, key, val) {
+      console.log('我是defineReactive', data, key, val)
+      if (arguments.length == 2) {
+        val = data[key]
+      }
+      let childObj = observe(val)
+      Object.defineProperty(data, key, {
+        enumerable: true,
+        configurable: true,
+        get() {
+          console.log('你访问了对象的' + key + '属性')
+          return val
+        },
+        set(newValue) {
+          console.log('你在修改对象的' + key + '属性')
+          if (val === newValue) return
+          val = newValue
+          childObj = observe(newValue)
+        }
+      })
+    }
+
+    class Observer {
+      constructor(value) {
+        console.log('我是Observer构造器', value)
+        def(value, '__ob__', this, false)
+        if(Array.isArray(value)) {
+          Object.setPrototypeOf(value, arrayMethods)
+          this.observeArray(value)
+        } else {
+          this.walk(value)
+        }
+      }
+      walk(value) {
+        for (let k in value) {
+          defineReactive(value, k)
+        }
+      }
+      observeArray(arr) {
+        for(let i = 0, l = arr.length; i < l; i++) {
+          observe(arr[i])
+        }
+      }
+    }
+
+    function observe(value) {
+      if (typeof value !== 'object') return
+      let ob
+      if (typeof value.__ob__ !== 'undefined') {
+        ob = value.__ob__
+      } else {
+        ob = new Observer(value)
+      } 
+      return ob
+    }
+
+    const arrayPrototype = Array.prototype
+    const arrayMethods = Object.create(arrayPrototype)
+    const methodsNeedChange = ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse']
+
+    methodsNeedChange.forEach(methodName => {
+      // 备份原来的方法，保持原有方法
+      const original = methodsNeedChange[methodName]
+      def(arrayMethods, methodName, function() {
+        const args = [...arguments]
+        const ob = this.__ob__
+        // 三种方法：push，unshift,splice能够插入新的项
+        let inserted = []
+        switch(methodName) {
+          case 'push':
+          case 'unshift':
+            inserted = args
+            break
+          case 'splice':
+            inserted = args.slice(2)
+            break
+        }
+        if(inserted) {
+          ob.observeArray(inserted)
+        }
+        const result = original.apply(this, args)
+        console.log('啦啦啦')
+        return result
+      }, false)
+    }) 
+    observe(obj)
+    obj.a.f = 0
+    obj.j.push(4)
+    console.log(obj.j)
+    
+    function parsePath(str) {
+      let args = str.split('.')
+      return (obj) => {
+        for(let i = 0; i < args.length; i++) {
+          if(!obj) return
+          obj = obj[args[i]]
+        }
+        return obj
+      }
+    }
+  </script>
+</body>
+
+</html>

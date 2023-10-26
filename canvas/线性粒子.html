@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.querySelector('#canvas')
+    const ctx = canvas.getContext('2d')
+    const h = document.documentElement.clientHeight - 6
+    const w = document.documentElement.clientWidth - 6
+    canvas.height = h
+    canvas.width = w
+    const ballList = []
+    function ran (num) {
+      return parseInt(Math.random() * num)
+    }
+    function Ball (x, y) {
+      this.x = ran(380) + 60 // [60, 440)
+      this.y = ran(380) + 60
+      this.r = ran(30) + 10 // [10, 40)
+      this.color = '#' + parseInt(Math.random() * 0xffffff).toString(16)
+      this.xSpeed = ran(3) + 2
+      this.ySpeed = ran(3) + 1
+    }
+    Ball.prototype.show = function () {
+      this.run()
+      drawCircle(this.x, this.y, this.r, this.color)
+    }
+    Ball.prototype.run = function () {
+      if (this.x - this.r <= 0 || this.x + this.r >= w) {
+        this.xSpeed = -this.xSpeed
+      }
+      this.x = this.x + this.xSpeed
+      if (this.y - this.r <= 0 || this.y + this.r >= h) {
+        this.ySpeed = -this.ySpeed
+      }
+      this.y = this.y + this.ySpeed
+    }
+    function drawLine (x1, y1, x2, y2, color) {
+      ctx.beginPath()
+      ctx.moveTo(x1, y1)
+      ctx.lineTo(x2, y2)
+      ctx.strokeStyle = color || '#000'
+      ctx.stroke()
+      ctx.closePath()
+    }
+    function drawText (text, x, y) {
+      ctx.font = '20px 微软雅黑'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(text, x, y)
+    }
+    function drawCircle (x, y, r, color) {
+      ctx.beginPath()
+      ctx.arc(x, y, r, 0, Math.PI * 2)
+      ctx.fillStyle = color || '#000'
+      ctx.fill()
+    }
+    let arr = []
+    for (let i = 0; i < 25; i++) {
+      let ball = new Ball()
+      arr.push(ball)
+      ball.show()
+      // 小球连线
+      for (let j = 0; j < i; j++) {
+        const prevBall = arr[j]
+        drawLine(ball.x, ball.y, prevBall.x, prevBall.y, ball.color)
+      }
+    }
+    setInterval(() => {
+      ctx.clearRect(0, 0, w, h)
+      for (let i = 0; i < arr.length; i++) {
+        arr[i].show()
+        for (let j = 0; j < i; j++) {
+          const prevBall = arr[j]
+          drawLine(arr[i].x, arr[i].y, prevBall.x, prevBall.y, arr[i].color)
+        }
+      }
+    });
+
+  </script>
+</body>
+
+</html>
