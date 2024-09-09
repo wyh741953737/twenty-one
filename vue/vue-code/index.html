@@ -6,19 +6,76 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="./vue.js"></script>
+  <style>
+ .container{
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-around;
+}
+/*左侧文字*/
+.left{
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      -webkit-line-clamp: 1;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      white-space: nowrap;
+      word-wrap: break-word;
+      word-break: break-all;
+      /* 弹性布局，空间有剩余，允许占用剩余空间，如果要收缩，也可以收缩，因为会切换为两行，auto则代表宽度始终为实际宽度*/
+      flex: 1 1 auto;
+   
+}
+/*右侧icon和标识文字盒子*/
+.right{
+      /*弹性布局，icon及其他标识文案，宽度不固定，则flex-basis:auto，始终为实际宽度，但是不能被截断，也不要占用多余的空间，多余的给文字使用，即不允许占用多余空间，也不允许收缩*/
+      flex:0 0 auto;
+}
+.flex {
+            display: flex;
+            background-color: rgb(14, 14, 14);
+            width: 800px;
+        }
+        .a {
+            background-color: thistle;
+            width: 100px;
+            flex-grow:0.4;
+        }
+        .b {
+            background-color: tomato;
+            width: 200px;
+            flex-grow:2.5;
+        }
+        .c {
+            background-color: violet;
+            width: 300px;
+            flex-shrink: 2;
+        }
+        .a,
+        .b,
+        .c {
+            height: 100px;
+        }
+  </style>
+  <script src="./vue2.js"></script>
 </head>
 
 <body>
   <div id="app">
+    <div class="flex">
+      <div class="a"></div>
+      <div class="b"></div>
+      <div class="c"></div>
+  </div>
     <h1 v-html="str" @click="clickStr" id="h1s"></h1>
     <h2>{{type}}</h2>
     <my-component></my-component>
   </div>
   <script>
-  Vue.component('my-component', {
-    template: '<div>A custom component!</div>'
-  })
+  // Vue.component('my-component', {
+  //   template: '<div>A custom component!</div>'
+  // })
 
   new Vue({
       el: '#app',
@@ -26,6 +83,11 @@
         str: '你好啊',
         type: {
           name: ''
+        }
+      },
+      computed: {
+        age: () => {
+          return this.type + 'age'
         }
       },
       methods: {
@@ -37,14 +99,18 @@
         type: {
           deep: true,
           handler: (newVal) => {
-           alert('====================', newVal)
-          }
+          //  alert('====================', newVal)
+          },
+          immediate: true
+        },
+        str: ()=> {
+          console.log('就啊家家')
         }
       },
       created() {
-        this.$nextTick(() => {
-          this.type.name = 'nextTick'
-        })
+        // this.$nextTick(() => {
+        //   this.type.name = 'nextTick'
+        // })
       },
       mounted() {
         this.type.name = '我在mounted改了数据'
